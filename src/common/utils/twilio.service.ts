@@ -9,8 +9,8 @@ export class TwilioService {
 
   constructor() {
     // console.log('Starting', process.env)
-    const accountSid = process.env.TWILIO_AC_ID as string; // Make sure this SID is correct
-    const authToken = process.env.TWILIO_TOKEN as string; // Make sure this Auth Token is correct
+    const accountSid = process.env.TWILIO_ACCOUNT_SID as string; // Make sure this SID is correct
+    const authToken = process.env.TWILIO_AUTH_TOKEN as string; // Make sure this Auth Token is correct
 
     if (!accountSid || !authToken) {
       throw new Error('Twilio SID or Auth Token is missing');

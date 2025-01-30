@@ -11,21 +11,19 @@ import { CategoryModule } from './category/category.module';
 import { RiderModule } from './rider/rider.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { MenuController } from './menu/menu-item/menu.controller';
-import { MenuService } from './menu/menu-item/menu.service';
 import { MenuModule } from './menu/menu-item/menu.module';
+import { BannerModule } from './banner/banner.module';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: './.env' });
 @Module({
   imports: [ConfigModule.forRoot({}),
   
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),  // Path to static files
-      serveRoot: '/uploads',  // URL path for static files
+      rootPath: join(__dirname, '..', 'public'), // Path to the folder containing the uploaded images
     }),
     
     MongooseModule.forRoot(process.env.MONGO_URI as string, {}),
-    AuthModule, UserModule, OrderModule, ProductModule, CategoryModule, RiderModule, MenuModule],
+    AuthModule, UserModule, OrderModule, ProductModule, CategoryModule, RiderModule, MenuModule, BannerModule],
   controllers: [AppController],
   providers: [AppService],
 })

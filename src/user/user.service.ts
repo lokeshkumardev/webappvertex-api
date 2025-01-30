@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../user/interface/user.interface'; // Import the User interface
-import * as twilio from 'twilio';
+import { CreateUserDto } from './dto/create-user.dto';
+import * as bcrypt from 'bcryptjs';
+
 
 @Injectable()
 export class UserService {
@@ -13,6 +15,27 @@ export class UserService {
   
   }
 
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    // Check if user email already exists
+    const existingUser = await this.userModel.findOne({
+      userEmail: createUserDto.userEmail,
+    });
+
+    if (existingUser) {
+      throw new Error('User with this email already exists');
+    }
+
+    // Hash password before saving
+    const hashedPassword = await bcrypt.hash(createUserDto.userPassword, 10);
+
+    // Create the new user with hashed password
+    const newUser = new this.userModel({
+      ...createUserDto,
+      userPassword: hashedPassword,
+    });
+
+    return await newUser.save();
+  }
 
   // Find a user by phone number
   async findByPhone(phone: string): Promise<User | null> {

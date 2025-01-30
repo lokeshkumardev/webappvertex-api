@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service'; // Import AuthService to use OTP functionality
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './interface/user.interface';
 
 @Controller('user')
 export class UserController {
@@ -12,9 +13,9 @@ export class UserController {
 
 
   @Post('craete-user')
-  async(@Body() CreateUserDto: CreateUserDto) {
-    console.log('hiiiii')
-
+  @Post()
+  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.userService.create(createUserDto);
   }
 
   // Other user CRUD operations (create, update, delete, etc.) remain unchanged
