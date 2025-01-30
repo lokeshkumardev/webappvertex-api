@@ -1,19 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { WsAdapter } from '@nestjs/platform-ws';
 import { ValidationPipe } from '@nestjs/common';
-
+import * as dotenv from 'dotenv';
+dotenv.config({ path: './.env' });
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
 
-  // Enable global validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true, // Automatically transforms payloads to DTO instances
-      whitelist: true, // Automatically removes properties that do not have decorators
-      forbidNonWhitelisted: true, // Throws an error if non-whitelisted properties are included
-    }),
-  );
-
-  await app.listen(8000);
+  // app.useWebSocketAdapter(new WsAdapter(app));
+  app.useGlobalPipes(new ValidationPipe());
+  await app.listen(process.env.PORT as string);
 }
 bootstrap();
