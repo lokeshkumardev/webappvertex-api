@@ -48,10 +48,9 @@ export class BannerController {
   @Get(':id')
   async findById(@Param('id') id: string) {
     try {
-      const banner = await this.bannerService.findById(id);
-      const baseUrl = 'http://localhost:3000';  // Change this to your actual base URL
+      const banner = await this.bannerService.findById(id);  // Change this to your actual base URL
       if (banner.imageUrl) {
-        banner.imageUrl = `${baseUrl}/uploads/banners/${banner.imageUrl}`;
+        banner.imageUrl = `${process.env.SERVER_BASE_URL}/uploads/banners/${banner.imageUrl}`;
       }
       return new CustomResponse(200, 'Banner fetched successfully', banner);
     } catch (error) {

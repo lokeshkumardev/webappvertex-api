@@ -19,46 +19,69 @@ import { imageUploadConfig } from '../common/utils/imageUpload.helper'; // Impor
 import { CustomResponse } from '../common/response/customeResponse'; // Import the custom response class
 import { generateResponse } from '../common/utils/response.utils';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { fileUpload } from 'src/util/fileupload';
+import { COMMON } from 'src/util/constants';
+import CustomError from 'src/common/providers/customer-error.service';
 
 @Controller('categories')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
 
   // Create and upload category image
   @Post()
-  @UseInterceptors(FileInterceptor('image', imageUploadConfig()))
+  @UseInterceptors(FileInterceptor('image'))
   async uploadCategoryImage(
     @UploadedFile() file: Express.Multer.File,
-    @Body('name') name: string,
-    @Body('description') description: string,
+    @Body() categoryCreateDto: CreateCategoryDto,
   ): Promise<CustomResponse<Category>> {
     console.log('Uploaded file:', file); // Debug statement
+    // try {
+    //   if (!file) {
+    //     throw new BadRequestException('Image is required');
+    //   }
+
+    //   const fileName = fileUpload('category', file);
+
+    //   categoryCreateDto.image = fileName;
+
+    //   const category =
+    //     await this.categoryService.createCategory(categoryCreateDto);
+
+
+    //   return generateResponse(
+    //     'success',
+    //     'Category created successfully',
+    //     category,
+    //   );
+    // } catch (error) {
+    //   console.error('Error:', error);
+    //   throw new InternalServerErrorException(
+    //     CustomResponse.error('Failed to create category'),
+    //   );
+    // }
     try {
-      if (!file) {
-        throw new BadRequestException('Image is required');
+      // Check if category already exists by name
+      const existingCategory =
+        await this.categoryService.getCategoryByName(categoryCreateDto.name);
+      if (existingCategory) {
+        return new CustomResponse('409', 'Category item already exists');
       }
 
-      const imagePath = `/assets/category/${file.filename}`; // Correct path for category
-
-      const createCategoryDto: CreateCategoryDto = {
-        name,
-        image: imagePath, // Use image path here
-        description,
-      };
+      // Upload the image and get image path
+      const imagePath = fileUpload('category', file);
+      categoryCreateDto.image = imagePath;
 
       const category =
-        await this.categoryService.createCategory(createCategoryDto);
+        await this.categoryService.createCategory(categoryCreateDto);
 
-      return generateResponse(
-        'success',
-        'Category created successfully',
+      return new CustomResponse(
+        '200',
+        COMMON.CREATED_SUCESSFULLY('Category'),
         category,
       );
     } catch (error) {
       console.error('Error:', error);
-      throw new InternalServerErrorException(
-        CustomResponse.error('Failed to create category'),
-      );
+      throw new CustomError(404, COMMON.NOT_FOUND('category'));
     }
   }
 
@@ -86,6 +109,7 @@ export class CategoryController {
     @Param('categoryId') categoryId: string,
   ): Promise<CustomResponse<Category>> {
     try {
+
       const category = await this.categoryService.getCategoryById(categoryId);
 
       if (!category) {
@@ -117,7 +141,8 @@ export class CategoryController {
   ): Promise<CustomResponse<Category>> {
     try {
       if (file) {
-        updateCategoryDto.image = `/assets/${file.filename}`; // Update the image path
+        const fileName = fileUpload('category', file);
+        updateCategoryDto.image = fileName; // Update the image path
       }
 
       const updatedCategory = await this.categoryService.updateCategory(

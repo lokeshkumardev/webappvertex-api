@@ -7,7 +7,7 @@ dotenv.config({ path: './.env' });
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-
+  app.setGlobalPrefix('api/v1');
   // app.useWebSocketAdapter(new WsAdapter(app));
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(process.env.PORT as string);

@@ -9,25 +9,25 @@ export class RiderController {
   constructor(private readonly riderService: RiderService) {}
 
   // Create a new rider
-  @Post()
+  @Post('addRider')
   async createRider(@Body() createRiderDto: CreateRiderDto) {
     return this.riderService.createRider(createRiderDto);
   }
 
   // Get all riders
-  @Get()
+  @Get('getAllRiders')
   async getAllRiders() {
     return this.riderService.getAllRiders();
   }
 
   // Get rider by ID
-  @Get(':riderId')
+  @Get('getRiderbyId:riderId')
   async getRiderById(@Param('riderId') riderId: string) {
     return this.riderService.getRiderById(riderId);
   }
 
   // Update rider status
-  @Put('status/:riderId')
+  @Put('UpdateRiderstatus/:riderId')
   async updateRiderStatus(
     @Param('riderId') riderId: string,
     @Body() updateRiderStatusDto: UpdateRiderStatusDto

@@ -5,8 +5,7 @@ export class CreateCategoryDto {
   @IsNotEmpty()
   name: string;
 
-  @IsString() // Add validation for Image field
-  @IsNotEmpty()
+ 
   image: string; // Changed from 'Image' to 'image' for consistency
 
   @IsString()
