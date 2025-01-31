@@ -1,8 +1,9 @@
 import { Controller, Post, Body, Get, Param, Put } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order-dto';
+import { ROUTE } from 'src/util/constants';
 
-@Controller('orders')
+@Controller(ROUTE.ORDER)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 

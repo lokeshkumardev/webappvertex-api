@@ -20,45 +20,22 @@ import { CustomResponse } from '../common/response/customeResponse'; // Import t
 import { generateResponse } from '../common/utils/response.utils';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { fileUpload } from 'src/util/fileupload';
-import { COMMON } from 'src/util/constants';
+import { COMMON, ROUTE } from 'src/util/constants';
 import CustomError from 'src/common/providers/customer-error.service';
 
-@Controller('categories')
+
+@Controller(ROUTE.CATEGORY)
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) { }
 
   // Create and upload category image
-  @Post()
+  @Post('createCategory')
   @UseInterceptors(FileInterceptor('image'))
   async uploadCategoryImage(
     @UploadedFile() file: Express.Multer.File,
     @Body() categoryCreateDto: CreateCategoryDto,
   ): Promise<CustomResponse<Category>> {
-    console.log('Uploaded file:', file); // Debug statement
-    // try {
-    //   if (!file) {
-    //     throw new BadRequestException('Image is required');
-    //   }
 
-    //   const fileName = fileUpload('category', file);
-
-    //   categoryCreateDto.image = fileName;
-
-    //   const category =
-    //     await this.categoryService.createCategory(categoryCreateDto);
-
-
-    //   return generateResponse(
-    //     'success',
-    //     'Category created successfully',
-    //     category,
-    //   );
-    // } catch (error) {
-    //   console.error('Error:', error);
-    //   throw new InternalServerErrorException(
-    //     CustomResponse.error('Failed to create category'),
-    //   );
-    // }
     try {
       // Check if category already exists by name
       const existingCategory =
@@ -86,7 +63,7 @@ export class CategoryController {
   }
 
   // Get all categories
-  @Get()
+  @Get('getAllCategory')
   async getAllCategory(): Promise<CustomResponse<Category[]>> {
     try {
       const categories = await this.categoryService.getAllCategory();
@@ -104,7 +81,7 @@ export class CategoryController {
   }
 
   // Get category by ID
-  @Get(':categoryId')
+  @Get('getCategoryById:categoryId')
   async getCategoryById(
     @Param('categoryId') categoryId: string,
   ): Promise<CustomResponse<Category>> {
@@ -132,7 +109,7 @@ export class CategoryController {
   }
 
   // Update category
-  @Put(':categoryId')
+  @Put('editCategory:categoryId')
   @UseInterceptors(FileInterceptor('image', imageUploadConfig())) // Use FileInterceptor to handle file uploads
   async updateCategory(
     @Param('categoryId') categoryId: string,

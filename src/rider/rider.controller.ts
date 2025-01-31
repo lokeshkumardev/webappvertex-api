@@ -3,8 +3,9 @@ import { RiderService } from './rider.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { UpdateRiderStatusDto } from './dto/update-rider-status.dto';
 import { AssignOrderDto } from './dto/assign-order.dto';
+import { ROUTE } from 'src/util/constants';
 
-@Controller('riders')
+@Controller(ROUTE.RIDER)
 export class RiderController {
   constructor(private readonly riderService: RiderService) {}
 

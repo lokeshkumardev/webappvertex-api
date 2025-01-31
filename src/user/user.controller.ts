@@ -3,8 +3,9 @@ import { AuthService } from '../auth/auth.service'; // Import AuthService to use
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './interface/user.interface';
+import { ROUTE } from 'src/util/constants';
 
-@Controller('user')
+@Controller(ROUTE.USER)
 export class UserController {
   constructor(
     private readonly userService: UserService,

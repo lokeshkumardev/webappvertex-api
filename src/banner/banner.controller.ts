@@ -6,12 +6,12 @@ import { throwException } from '../util/errorhandling';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateBannerDto } from './dto/updateBanner.dto';
-
-@Controller('banners')
+import { ROUTE } from 'src/util/constants';
+@Controller(ROUTE.BANNER)
 export class BannerController {
-  constructor(private readonly bannerService: BannerService) {}
+  constructor(private readonly bannerService: BannerService) { }
 
-  @Post()
+  @Post('createBanner')
   @UseInterceptors(FileInterceptor('bannerImage')) // Intercept file uploads
   async create(
     @Body() createBannerDto: CreateBannerDto,
@@ -35,7 +35,7 @@ export class BannerController {
     }
   }
 
-  @Get()
+  @Get('getAllBanner')
   async findAll() {
     try {
       const banners = await this.bannerService.findAll();
@@ -45,7 +45,7 @@ export class BannerController {
     }
   }
 
-  @Get(':id')
+  @Get('getBannerById:id')
   async findById(@Param('id') id: string) {
     try {
       const banner = await this.bannerService.findById(id);  // Change this to your actual base URL
@@ -58,16 +58,16 @@ export class BannerController {
     }
   }
 
-  @Put(':id')
+  @Put('editBanner:id')
   @UseInterceptors(FileInterceptor('bannerImage')) // Intercept file uploads for update
   async update(
     @Param('id') id: string,
-    @Body() updateBannerDto: CreateBannerDto,
+    @Body() updateBannerDto: UpdateBannerDto,
     @UploadedFile() file: Express.Multer.File, // Get the uploaded file
   ) {
     try {
-        console.log('file',file)
-        const fileName = fileUpload('banners', file);
+      console.log('file', file)
+      const fileName = fileUpload('banners', file);
 
       // Add file name to the DTO
       updateBannerDto.bannerImage = fileName;
@@ -78,7 +78,7 @@ export class BannerController {
     }
   }
 
-  @Delete(':id')
+  @Delete('deleteBanner:id')
   async delete(@Param('id') id: string) {
     try {
       await this.bannerService.delete(id);

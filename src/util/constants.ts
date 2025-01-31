@@ -28,7 +28,14 @@ export const ROUTE = {
   SEND: 'send',
   RESEND: 'resend',
   VERIFY: 'verify',
-  RESET_PASSWORD:'reset-password'
+  RESET_PASSWORD:'reset-password',
+  CATEGORY:'categories',
+  ORDER:'order',
+  USER:'user',
+  RIDER:'rider',
+  BANNER:'banner',
+  MENU:'menu',
+  
 };
 export const MESSAGE = {
  

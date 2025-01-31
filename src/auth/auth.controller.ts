@@ -3,10 +3,11 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { ROUTE } from 'src/util/constants';
 // import { GenerateOtpDto } from './dto/generate-otp.dto';
 // import { VerifyOtpDto } from './dto/verify-otp.dto';
 
-@Controller('auth')
+@Controller(ROUTE.AUTH)
 export class AuthController {
   constructor(private authService: AuthService) {}
 

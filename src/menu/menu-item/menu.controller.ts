@@ -4,6 +4,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import * as fs from 'fs';
+import { ROUTE } from 'src/util/constants';
+
 
 // Path for storing uploaded images
 const imageStorage = diskStorage({
@@ -14,7 +16,7 @@ const imageStorage = diskStorage({
   },
 });
 
-@Controller('menu')
+@Controller(ROUTE.MENU)
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
