@@ -1,14 +1,22 @@
-import { IsString, IsNotEmpty } from 'class-validator';
-
-export class CreateCategoryDto {
-  @IsString()
-  @IsNotEmpty()
+// src/dto/category.dto.ts
+export class CreateCategoryDTO {
   name: string;
-
- 
-  image: string; // Changed from 'Image' to 'image' for consistency
-
-  @IsString()
-  @IsNotEmpty()
   description: string;
+  slug: string;
+  web_image?: string[];  // Optional array of strings
+  app_image?: string[];  // Optional array of strings
+  offer?: string;
+  meta_title?: string;
+  meta_description?: string;
+}
+
+export class UpdateCategoryDTO {
+  name?: string;
+  description?: string;
+  web_image?: string[];  // Optional array of strings
+  app_image?: string[];  // Optional array of strings
+  offer?: string;
+  meta_title?: string;
+  meta_description?: string;
+  slug: string;
 }

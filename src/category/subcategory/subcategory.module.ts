@@ -8,7 +8,7 @@ import { CategoryModule } from '../category.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Subcategory', schema: SubcategorySchema }]),
-    forwardRef(() => CategoryModule), // Use forwardRef here to resolve circular dependency
+    forwardRef(() => CategoryModule), // Resolves circular dependency
   ],
   controllers: [SubcategoryController],
   providers: [SubcategoryService],

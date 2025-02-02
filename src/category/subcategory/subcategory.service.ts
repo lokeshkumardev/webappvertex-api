@@ -1,92 +1,164 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, NotFoundException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Subcategory } from '../category.schema/sub-category.schema';
-import { CategoryService } from '../category.service';
-import { UpdateSubcategoryDto } from '../dto/update-subcategory.dto';
+import { CreateSubcategoryDTO, UpdateSubcategoryDTO } from '../dto/create-subcategory.dto';
+import CustomResponse from 'src/common/providers/custom-response.service';
+import { throwException } from 'src/util/errorhandling';
+import { Category } from '../category.schema/category.schema'; // Corrected import path
+
 
 @Injectable()
 export class SubcategoryService {
   constructor(
     @InjectModel('Subcategory') private subcategoryModel: Model<Subcategory>,
-    private readonly categoryService: CategoryService, // Inject CategoryService to validate categories
-  ) {}
+    @InjectModel('Category') private categoryModel: Model<Category>, // Inject Category Model
+  ) { }
 
-  // Create a new subcategory
-  async createSubcategory(createSubcategoryDto: any): Promise<any> {
-    // Ensure category exists
-    const category = await this.categoryService.getCategoryById(
-      createSubcategoryDto.category,
-    );
-    if (!category) {
-      throw new Error('Category not found');
-    }
+  private generateImageUrls(files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }, serverUrl: string) {
+    const appImageUrls = files.app_image
+      ? files.app_image.map(file => `${serverUrl}/uploads/${file.filename}`)
+      : [];
 
-    const newSubcategory = new this.subcategoryModel(createSubcategoryDto);
-    const savedSubcategory = await newSubcategory.save();
+    const webImageUrls = files.web_image
+      ? files.web_image.map(file => `${serverUrl}/uploads/${file.filename}`)
+      : [];
 
-    // Transform the response to include indexed images
-    const transformedResponse = {
-      ...savedSubcategory.toObject(),
-      images: savedSubcategory.images.map((image: string, index: number) => ({
-        index,
-        image,
-      })),
-    };
-
-    return {
-      status: 'success',
-      message: 'Subcategory created successfully',
-      data: transformedResponse,
-    };
+    return { appImageUrls, webImageUrls };
   }
 
-  // Get all subcategories
-  async getAllSubcategories(): Promise<Subcategory[]> {
-    return this.subcategoryModel.find().exec();
-  }
-
-  // Get subcategory by ID
-  async getSubcategoryById(subcategoryId: string): Promise<Subcategory | null> {
-    return this.subcategoryModel
-      .findById(subcategoryId)
-      .populate('category')
-      .exec();
-  }
-
-  // Get subcategories by category
-  async getSubcategoriesByCategory(categoryId: string): Promise<Subcategory[]> {
-    return this.subcategoryModel.find({ category: categoryId }).exec();
-  }
-
-  async updateSubcategory(
-    subcategoryId: string,
-    updateSubcategoryDto: UpdateSubcategoryDto,
-  ): Promise<any> {
+  // Create Subcategory
+  async createSubcategory(createSubcategoryDto: CreateSubcategoryDTO, files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }) {
     try {
-      // Fetch the existing subcategory
-      const existingSubcategory =
-        await this.subcategoryModel.findById(subcategoryId);
-      if (!existingSubcategory) {
-        throw new Error('Subcategory not found');
+      const serverUrl = 'http://localhost:3000'; // Adjust for production URL
+
+      // Check if Category exists
+      const category = await this.categoryModel.findById(createSubcategoryDto.categoryId);
+      if (!category) {
+        throw new NotFoundException('Category not found');
       }
+      // const categoryBySlug = await this.categoryModel.findOne({ slug: createSubcategoryDto.slug });
+      // if (!categoryBySlug) {
+      //   throw new NotFoundException('Category with the specified slug not found');
+      // }
 
-      // Update the images field only if new images are provided
-      if (
-        updateSubcategoryDto.images &&
-        updateSubcategoryDto.images.length > 0
-      ) {
-        existingSubcategory.images = updateSubcategoryDto.images; // Overwrite images
-      }
+      // Generate image URLs
+      const { appImageUrls, webImageUrls } = this.generateImageUrls(files, serverUrl);
 
-      // Update other fields
-      Object.assign(existingSubcategory, updateSubcategoryDto);
+      // Add these URLs to DTO before saving
+      createSubcategoryDto.app_image = appImageUrls;
+      createSubcategoryDto.web_image = webImageUrls;
+      console.log(createSubcategoryDto)
+      // Create the subcategory
+      const subcategory = new this.subcategoryModel(createSubcategoryDto);
+      // console.log('hiii',subcategory)
+      const subSave = await subcategory.save();
+      return new CustomResponse(
+        HttpStatus.OK,
+        'CreateSubcategory Save SuccessFully',
+        subSave
+      );
 
-      // Save the updated subcategory
-      return await existingSubcategory.save();
     } catch (error) {
-      console.error('Error updating subcategory:', error);
-      throw new Error('Failed to update subcategory');
+      throwException(error);
+    }
+  }
+
+  // Update Subcategory
+  async updateSubcategory(id: string, updateSubcategoryDto: UpdateSubcategoryDTO, files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }) {
+    try {
+      const serverUrl = 'http://localhost:3000'; // Adjust for production URL
+
+      // Check if Category exists
+      const category = await this.categoryModel.findById(updateSubcategoryDto.categoryId);
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
+      const { appImageUrls, webImageUrls } = this.generateImageUrls(files, serverUrl);
+
+      updateSubcategoryDto.app_image = appImageUrls;
+      updateSubcategoryDto.web_image = webImageUrls;
+
+      const subcategory = await this.subcategoryModel.findByIdAndUpdate(id, updateSubcategoryDto, { new: true });
+      if (!subcategory) {
+        throw new NotFoundException('SubCategory  not found');
+      }
+      return new CustomResponse(
+        HttpStatus.OK,
+        'CreateSubcategory Update Successfully',
+        subcategory
+      );
+
+    } catch (error) {
+      throwException(error);
+    }
+  }
+
+  // Delete Subcategory
+  async deleteSubcategory(id: string) {
+    try {
+      const subcategory = await this.subcategoryModel.findByIdAndDelete(id);
+      if (!subcategory) {
+        throw new NotFoundException('Category not found');
+      }
+      return new CustomResponse(
+        HttpStatus.OK,
+        'CreateSubcategory Delete SuccessFully',
+        subcategory
+      );
+    } catch (error) {
+      throwException(error)
+    }
+  }
+
+  // Get Subcategories by UserType
+  async getSubcategoriesByUserType(userType: 'daily' | 'permanent') {
+    try {
+      const subcategories = await this.subcategoryModel.find({ userType });
+      return new CustomResponse(
+        HttpStatus.OK,
+        'Get All SubCategory SucessFully',
+        subcategories
+      );
+    } catch (error) {
+      throw new Error(`Error fetching subcategories: ${error.message}`);
+    }
+  }
+
+  // Get All Subcategories
+  async getAllSubcategories() {
+    try {
+      const subcategories = await this.subcategoryModel.find();
+      return new CustomResponse(
+        HttpStatus.OK,
+        'Subcategory Get All SuccessFully',
+        subcategories
+      );
+    } catch (error) {
+      throwException(error)
+    }
+  }
+
+  // Get Subcategories by Category ID
+  async getSubcategoriesByCategoryId(categoryId: string) {
+    try {
+      // Check if the category exists
+      const category = await this.subcategoryModel.findById(categoryId);
+      if (!category) {
+        throw new NotFoundException('SubCategory Not Found ')
+      }
+
+      const subcategories = await this.subcategoryModel.findById(categoryId );
+      console.log(subcategories)
+      return new CustomResponse(
+        HttpStatus.OK,
+        'Subcategory By Id  SuccessFully',
+        subcategories
+      );
+    } catch (error) {
+      throwException(error)
     }
   }
 }
+

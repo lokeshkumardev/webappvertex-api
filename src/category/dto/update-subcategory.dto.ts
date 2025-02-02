@@ -21,7 +21,13 @@ export class UpdateSubcategoryDto {
   @IsString()
   categoryType: string;
 
-  images?: string[];
+  @IsString()
+  @IsOptional()
+  app_image?: string[]; // Optional image path
+
+  @IsString()
+  @IsOptional()
+  web_image?: string[];
 
   @IsOptional()
   @IsString()
@@ -30,4 +36,5 @@ export class UpdateSubcategoryDto {
   @IsOptional()
   @IsString()
   metaDescription?: string;
+s
 }

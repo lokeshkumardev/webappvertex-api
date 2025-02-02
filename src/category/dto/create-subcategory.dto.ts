@@ -1,30 +1,30 @@
-import { IsString, IsNotEmpty, IsMongoId, IsArray } from 'class-validator';
-
-export class CreateSubcategoryDto {
-  @IsString()
-  @IsNotEmpty()
+// src/dto/subcategory.dto.ts
+export class CreateSubcategoryDTO {
   name: string;
+  description: string;
+  slug: string;
+  web_image?: string[]; // Separate for web images
+  app_image?: string[]; // Separate for app images
+  price?: number;
+  rating?: number;
+  offer?: string;
+  categoryId: string;
+  userType: 'daily' | 'permanent';
+  meta_title?: string;
+  meta_description?: string;
+}
 
-  @IsMongoId()
-  @IsNotEmpty()
-  category: string; // The category this subcategory belongs to
-
-  @IsString()
-  @IsNotEmpty()
-  categoryType: string; // Subcategory type
-
-  @IsString()
-  @IsNotEmpty()
-  slug: string; // Unique identifier for the subcategory
-
-  // @IsArray()
-  images: string[]; // Array of image URLs
-
-  @IsString()
-  @IsNotEmpty()
-  metaTitle: string;
-
-  @IsString()
-  @IsNotEmpty()
-  metaDescription: string;
+export class UpdateSubcategoryDTO {
+  name?: string;
+  description?: string;
+  slug?: string;
+  web_image?: string[]; // Separate for web images
+  app_image?: string[]; // Separate for app images
+  price?: number;
+  rating?: number;
+  offer?: string;
+  categoryId:string;
+  userType?: 'daily' | 'permanent';
+  meta_title?: string;
+  meta_description?: string;
 }

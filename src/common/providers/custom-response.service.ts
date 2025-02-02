@@ -1,4 +1,7 @@
 export default class CustomResponse{
+    static error(arg0: string) {
+      throw new Error('Method not implemented.');
+    }
     public statusCode: number;
     public message: string
     public result : any 

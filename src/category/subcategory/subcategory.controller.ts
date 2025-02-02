@@ -1,145 +1,69 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Param,
-  Put,
-  UploadedFiles,
-  UseInterceptors,
-  InternalServerErrorException,
-  BadRequestException,
-} from '@nestjs/common';
-import { SubcategoryService } from './subcategory.service';
-import { CreateSubcategoryDto } from '../dto/create-subcategory.dto';
-import { UpdateSubcategoryDto } from '../dto/update-subcategory.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { generateResponse } from 'src/common/utils/response.utils';
-import { imageUploadConfig } from '../../common/utils/imageUpload.helper'; // Import your helper function
-import { CustomResponse } from 'src/common/response/customeResponse'; // Import CustomResponse type
-
-@Controller('subcategories')
+// src/controllers/subcategory.controller.ts
+import { Controller, Post, Body, Param, Get, Put, Delete, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { SubcategoryService } from '../subcategory/subcategory.service';
+import { CreateSubcategoryDTO, UpdateSubcategoryDTO } from '../dto/create-subcategory.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express'; // Changed to FileFieldsInterceptor for multiple file upload
+import { multerOptions } from 'src/util/multiplefileupload';
+@Controller('subcategory')
 export class SubcategoryController {
   constructor(private readonly subcategoryService: SubcategoryService) {}
 
-  // Create a new subcategory with multiple images
   @Post()
-  @UseInterceptors(FilesInterceptor('images', 10, imageUploadConfig())) // Use the imported helper here
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'app_image', maxCount: 5 },
+        { name: 'web_image', maxCount: 5 },
+      ],
+      multerOptions
+    )
+  )
   async createSubcategory(
-    @UploadedFiles() files: Express.Multer.File[], // Handle multiple files
-    @Body() createSubcategoryDto: CreateSubcategoryDto,
-  ): Promise<CustomResponse<any>> {
-    try {
-      // Validate file upload
-      if (!files || files.length === 0) {
-        throw new BadRequestException('At least one image is required');
-      }
-
-      // Map the file paths to be stored in the database
-      const imagePaths = files.map(
-        (file) => `/assets/subCategory/${file.filename}`, // Ensure this matches the path in your helper
-      );
-      createSubcategoryDto.images = imagePaths; // Assign the paths to images array
-
-      // Create the subcategory
-      const subcategory =
-        await this.subcategoryService.createSubcategory(createSubcategoryDto);
-
-      return generateResponse(
-        'success',
-        'Subcategory created successfully',
-        subcategory,
-      );
-    } catch (error) {
-      console.error('Error:', error);
-      throw new InternalServerErrorException(
-        CustomResponse.error('Failed to create subcategory'),
-      );
-    }
-  }
-  // Get all subcategories
-  @Get()
-  async getAllSubcategories() {
-    try {
-      const subcategories = await this.subcategoryService.getAllSubcategories();
-      return generateResponse(
-        'success',
-        'Subcategories fetched successfully',
-        subcategories,
-      );
-    } catch (error) {
-      console.error('Error:', error);
-      return generateResponse(
-        'error',
-        'Failed to fetch subcategories',
-        error.message || error,
-      );
-    }
+    @Body() createSubcategoryDto: CreateSubcategoryDTO,
+    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }
+  ) {
+    return this.subcategoryService.createSubcategory(createSubcategoryDto, files);
   }
 
-  // Get subcategory by ID
-  @Get(':subcategoryId')
-  async getSubcategoryById(@Param('subcategoryId') subcategoryId: string) {
-    try {
-      const subcategory =
-        await this.subcategoryService.getSubcategoryById(subcategoryId);
-      if (!subcategory) {
-        return generateResponse('error', 'Subcategory not found');
-      }
-      return generateResponse(
-        'success',
-        'Subcategory fetched successfully',
-        subcategory,
-      );
-    } catch (error) {
-      console.error('Error:', error);
-      return generateResponse(
-        'error',
-        'Failed to fetch subcategory',
-        error.message || error,
-      );
-    }
-  }
-
-  @Put(':subcategoryId')
-  @UseInterceptors(FilesInterceptor('images', 10, imageUploadConfig()))
+  @Put('editSubCategory/:id')
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'app_image', maxCount: 5 },
+        { name: 'web_image', maxCount: 5 },
+      ],
+      multerOptions
+    )
+  )
   async updateSubcategory(
-    @Param('subcategoryId') subcategoryId: string,
-    @UploadedFiles() files: Express.Multer.File[], // Handle multiple files
-    @Body() updateSubcategoryDto: UpdateSubcategoryDto,
-  ): Promise<CustomResponse<any>> {
-    try {
-      // Process new images if provided
-      if (files && files.length > 0) {
-        const imagePaths = files.map(
-          (file) => `/assets/subCategory/${file.filename}`,
-        );
-        updateSubcategoryDto.images = imagePaths; // Assign new images
-      }
+    @Param('id') id: string,
+    @Body() updateSubcategoryDto: UpdateSubcategoryDTO,
+    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }
+  ) {
+    return this.subcategoryService.updateSubcategory(id, updateSubcategoryDto, files);
+  }
 
-      // Call the service to update the subcategory
-      const updatedSubcategory =
-        await this.subcategoryService.updateSubcategory(
-          subcategoryId,
-          updateSubcategoryDto,
-        );
+  @Delete(':id')
+  async deleteSubcategory(@Param('id') id: string) {
+    return this.subcategoryService.deleteSubcategory(id);
+  }
 
-      if (!updatedSubcategory) {
-        return generateResponse('error', 'Subcategory not found for update');
-      }
+  @Get('getCategoryByUserType')
+  async getSubcategoriesByUserType(@Query('userType') userType: 'daily' | 'permanent') {
+    return this.subcategoryService.getSubcategoriesByUserType(userType);
+  }
 
-      return generateResponse(
-        'success',
-        'Subcategory updated successfully',
-        updatedSubcategory,
-      );
-    } catch (error) {
-      console.error('Error:', error);
-      return generateResponse(
-        'error',
-        'Failed to update subcategory',
-        error.message || error,
-      );
-    }
+  // New endpoint to get all subcategories
+  @Get('getAllSubCategory')
+  async getAllSubcategories() {
+    return this.subcategoryService.getAllSubcategories();
+  }
+
+  // New endpoint to get subcategories by categoryId
+  @Get('category/:categoryId')
+  async getSubcategoriesByCategoryId(@Param('categoryId') categoryId: string) {
+    return this.subcategoryService.getSubcategoriesByCategoryId(categoryId);
   }
 }
+
+

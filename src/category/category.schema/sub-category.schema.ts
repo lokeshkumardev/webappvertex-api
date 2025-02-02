@@ -1,50 +1,47 @@
-import { Schema, Document } from 'mongoose';
+// src/models/sub-category.schema.ts
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-export const SubcategorySchema = new Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    category: {
-      type: Schema.Types.ObjectId,
-      ref: 'Category',
-      required: true,
-    }, // Linking subcategory with category
-    categoryType: {
-      type: String,
-      required: true, // Fixed typo
-    },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    images: {
-      type: [String], // Array of strings
-      required: true,
-    },
+export type SubcategoryDocument = Subcategory & Document;
 
-    metaTitle: {
-      type: String,
-      required: true,
-    },
-    metaDescription: {
-      type: String,
-      required: true,
-    },
-  },
-  { timestamps: true },
-);
-
-// Subcategory Interface
-export interface Subcategory extends Document {
+@Schema()
+export class Subcategory {
+  @Prop({ required: true })
   name: string;
-  category: string; // Category ID this subcategory belongs to
-  categoryType: string;
+
+  @Prop({ required: true })
+  description: string;
+
+  @Prop({ required: true })
   slug: string;
-  images: string[];
-  metaTitle: string;
-  metaDescription: string;
+
+  @Prop({ type: [String], required: false }) // Marked as optional
+  web_image?: string[];
+
+  @Prop({ type: [String], required: false }) // Marked as optional
+  app_image?: string[];
+
+  @Prop()
+  price: number;
+
+  @Prop()
+  rating: number;
+
+  @Prop()
+  offer: string;
+
+  @Prop({ required: true })
+  categoryId: string;  // Make sure this is the correct reference field type
+
+  @Prop({ required: true, enum: ['daily', 'permanent'] })
+  userType: 'daily' | 'permanent';
+
+  @Prop()
+  meta_title: string;
+
+  @Prop()
+  meta_description: string;
 }
+
+// Export the Mongoose schema
+export const SubcategorySchema = SchemaFactory.createForClass(Subcategory);

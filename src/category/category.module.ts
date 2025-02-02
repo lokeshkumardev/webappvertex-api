@@ -12,6 +12,6 @@ import { SubcategoryModule } from './subcategory/subcategory.module';
   ],
   controllers: [CategoryController],
   providers: [CategoryService],
-  exports: [CategoryService],
+  exports: [CategoryService,MongooseModule],
 })
 export class CategoryModule {}

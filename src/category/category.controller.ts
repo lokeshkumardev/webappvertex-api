@@ -1,148 +1,62 @@
-import {
-  Controller,
-  UseInterceptors,
-  UploadedFile,
-  Post,
-  Body,
-  Get,
-  InternalServerErrorException,
-  BadRequestException,
-  Param,
-  Put,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+// src/controllers/category.controller.ts
+import { Controller, Post, Body, Param, Put, Get, Delete, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { Express } from 'express'; // Correct import for file type
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { Category } from './category.schema/category.schema';
-import { imageUploadConfig } from '../common/utils/imageUpload.helper'; // Import the helper
-import { CustomResponse } from '../common/response/customeResponse'; // Import the custom response class
-import { generateResponse } from '../common/utils/response.utils';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { fileUpload } from 'src/util/fileupload';
-import { COMMON, ROUTE } from 'src/util/constants';
-import CustomError from 'src/common/providers/customer-error.service';
+import { CreateCategoryDTO, UpdateCategoryDTO } from '../category/dto/create-category.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/util/multiplefileupload';
 
-
-@Controller(ROUTE.CATEGORY)
+@Controller('category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) { }
+  constructor(private readonly categoryService: CategoryService) {}
 
-  // Create and upload category image
-  @Post('createCategory')
-  @UseInterceptors(FileInterceptor('image'))
-  async uploadCategoryImage(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() categoryCreateDto: CreateCategoryDto,
-  ): Promise<CustomResponse<Category>> {
-
-    try {
-      // Check if category already exists by name
-      const existingCategory =
-        await this.categoryService.getCategoryByName(categoryCreateDto.name);
-      if (existingCategory) {
-        return new CustomResponse('409', 'Category item already exists');
-      }
-
-      // Upload the image and get image path
-      const imagePath = fileUpload('category', file);
-      categoryCreateDto.image = imagePath;
-
-      const category =
-        await this.categoryService.createCategory(categoryCreateDto);
-
-      return new CustomResponse(
-        '200',
-        COMMON.CREATED_SUCESSFULLY('Category'),
-        category,
-      );
-    } catch (error) {
-      console.error('Error:', error);
-      throw new CustomError(404, COMMON.NOT_FOUND('category'));
-    }
+  @Post('addCategory')
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'app_image', maxCount: 5 },
+        { name: 'web_image', maxCount: 5 },
+      ],
+      multerOptions
+    )
+  )
+  async createCategory(
+    @Body() createCategoryDto: CreateCategoryDTO,
+    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }
+  ) {
+    return this.categoryService.createCategory(createCategoryDto, files);
   }
 
-  // Get all categories
-  @Get('getAllCategory')
-  async getAllCategory(): Promise<CustomResponse<Category[]>> {
-    try {
-      const categories = await this.categoryService.getAllCategory();
-      return generateResponse(
-        'success',
-        'Categories retrieved successfully',
-        categories,
-      );
-    } catch (error) {
-      console.error('Error:', error);
-      throw new InternalServerErrorException(
-        CustomResponse.error('Failed to retrieve categories'),
-      );
-    }
-  }
-
-  // Get category by ID
-  @Get('getCategoryById:categoryId')
-  async getCategoryById(
-    @Param('categoryId') categoryId: string,
-  ): Promise<CustomResponse<Category>> {
-    try {
-
-      const category = await this.categoryService.getCategoryById(categoryId);
-
-      if (!category) {
-        throw new BadRequestException(
-          `Category with ID ${categoryId} not found`,
-        );
-      }
-
-      return generateResponse(
-        'success',
-        'Category retrieved successfully',
-        category,
-      );
-    } catch (error) {
-      console.error('Error:', error);
-      throw new InternalServerErrorException(
-        CustomResponse.error('Failed to retrieve category'),
-      );
-    }
-  }
-
-  // Update category
-  @Put('editCategory:categoryId')
-  @UseInterceptors(FileInterceptor('image', imageUploadConfig())) // Use FileInterceptor to handle file uploads
+  @Put('editCategory/:id')
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'app_image', maxCount: 5 },
+        { name: 'web_image', maxCount: 5 },
+      ],
+      multerOptions
+    )
+  )
   async updateCategory(
-    @Param('categoryId') categoryId: string,
-    @UploadedFile() file: Express.Multer.File, // Corrected typing
-    @Body() updateCategoryDto: UpdateCategoryDto,
-  ): Promise<CustomResponse<Category>> {
-    try {
-      if (file) {
-        const fileName = fileUpload('category', file);
-        updateCategoryDto.image = fileName; // Update the image path
-      }
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDTO,
+    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }
+  ) {
+    return this.categoryService.updateCategory(id, updateCategoryDto, files);
+  }
 
-      const updatedCategory = await this.categoryService.updateCategory(
-        categoryId,
-        updateCategoryDto,
-      );
+  @Delete('deleteCategory/:id')
+  async deleteCategory(@Param('id') id: string) {
+    return this.categoryService.deleteCategory(id);
+  }
 
-      if (!updatedCategory) {
-        throw new BadRequestException(
-          `Category with ID ${categoryId} not found`,
-        );
-      }
+  @Get('getCategoryById/:id')
+  async getCategoryById(@Param('id') id: string) {
+    return this.categoryService.getCategoryById(id);
+  }
 
-      return generateResponse(
-        'success',
-        'Category updated successfully',
-        updatedCategory,
-      );
-    } catch (error) {
-      console.error('Error:', error);
-      throw new InternalServerErrorException(
-        CustomResponse.error('Failed to update category'),
-      );
-    }
+  // New endpoint to get all categories
+  @Get('getAllCategory')
+  async getAllCategories() {
+    return this.categoryService.getAllCategories();
   }
 }

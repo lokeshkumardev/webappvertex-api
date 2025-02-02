@@ -7,9 +7,11 @@ export class UpdateCategoryDto {
 
   @IsString()
   @IsOptional()
-  image?: string; // Optional image path
+  app_image?: string; // Optional image path
 
   @IsString()
   @IsOptional()
-  description?: string; // Optional image path
+  web_image?: string;
+
+  
 }
