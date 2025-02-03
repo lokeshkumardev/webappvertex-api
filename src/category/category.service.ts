@@ -14,6 +14,7 @@ export class CategoryService {
   ) { }
 
   private generateImageUrls(files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }, serverUrl: string) {
+    console.log('file',files);
     const appImageUrls = files.app_image
       ? files.app_image.map(file => `${serverUrl}/uploads/${file.filename}`)
       : [];
@@ -42,7 +43,8 @@ export class CategoryService {
         throw new NotFoundException('Category with the same name or slug already exists');
       }
 
-      const serverUrl = 'http://localhost:3000'; // Adjust for production URL
+      const serverUrl = 'http://147.93.103.99:8000/'; // Adjust for production URL
+      
       const { appImageUrls, webImageUrls } = this.generateImageUrls(files, serverUrl);
 
       createCategoryDto.app_image = appImageUrls;
@@ -76,7 +78,7 @@ export class CategoryService {
         throw new NotFoundException(404, 'Category not found');
       }
 
-      const serverUrl = 'http://localhost:3000'; // Adjust for production URL
+      const serverUrl = 'http://147.93.103.99:8000/'; // Adjust for production URL
       const { appImageUrls, webImageUrls } = this.generateImageUrls(files, serverUrl);
 
       updatedCategory.app_image = appImageUrls;

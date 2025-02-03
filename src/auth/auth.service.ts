@@ -1,4 +1,4 @@
-import { Injectable ,HttpStatus} from '@nestjs/common';
+import { Injectable ,HttpStatus, NotFoundException} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs'; // Password hashing
 import { Model } from 'mongoose';
@@ -132,16 +132,19 @@ export class AuthService {
         const isPasswordValid = await bcrypt.compare(userPassword, user.userPassword); // Compare hashed password
 
         if (isPasswordValid) {
-          return { message: 'Login successful', userId: user._id };
+          // return { message: 'Login successful', userId: user._id };
+          return new CustomResponse(200,
+            'Login successful',
+            user)
         }
 
-        throw new Error('Invalid password');
+        throw new NotFoundException('Invalid Password !');
       }
 
       throw new Error('Unauthorized access');
     } catch (error) {
       console.error('Error in adminLogin:', error);
-      throw new Error('Admin login failed');
+      throwException(error);
     }
   }
 }

@@ -36,7 +36,7 @@ export class CategoryController {
       multerOptions
     )
   )
-  async updateCategory(
+  async (
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDTO,
     @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }
@@ -56,6 +56,7 @@ export class CategoryController {
 
   // New endpoint to get all categories
   @Get('getAllCategory')
+
   async getAllCategories() {
     return this.categoryService.getAllCategories();
   }

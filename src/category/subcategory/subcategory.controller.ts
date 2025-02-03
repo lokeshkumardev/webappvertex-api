@@ -58,12 +58,19 @@ export class SubcategoryController {
   async getAllSubcategories() {
     return this.subcategoryService.getAllSubcategories();
   }
-
+  @Get('getSubCategoryBySubcategoryID/:id')
+  async getSubCategoryBySubcategoryID(@Param('id') id:string) {
+    return this.subcategoryService.getSubCategoryBySubcategoryID(id);
+  }
   // New endpoint to get subcategories by categoryId
-  @Get('category/:categoryId')
+  @Get('getSubcategoriesByCategoryId/:categoryId')
   async getSubcategoriesByCategoryId(@Param('categoryId') categoryId: string) {
     return this.subcategoryService.getSubcategoriesByCategoryId(categoryId);
   }
+  // @Get('category/:categoryId')
+  // async getSubCategoryByCategoryId(@Param('categoryId') categoryId: string) {
+  //   return this.subcategoryService.getSubcategoriesByCategoryId(categoryId);
+  // }
 }
 
 

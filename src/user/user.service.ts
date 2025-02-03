@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../user/interface/user.interface'; // Import the User interface
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcryptjs';
+import CustomResponse from 'src/common/providers/custom-response.service';
+import { throwException } from 'src/util/errorhandling';
 
 
 @Injectable()
@@ -12,29 +14,48 @@ export class UserService {
   private otpStore: { [key: string]: string } = {}; // Temporary in-memory store for OTPs
 
   constructor(@InjectModel('User') private userModel: Model<User>) {
-  
+
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto) {
+    console.log('hiii', this.userModel)
     // Check if user email already exists
-    const existingUser = await this.userModel.findOne({
-      userEmail: createUserDto.userEmail,
-    });
+    try {
+      if (!createUserDto.userEmail) {
+        throw new NotFoundException('Email Field Is Requrired');
+      }
+      if(!createUserDto.userPassword)
+      {
+      
+      }else{
+        const userPhone = await this.userModel.findOne({userPhone:createUserDto.userPhone})
+        if (userPhone) {
+          throw new CustomResponse(409, 'userPhone Already Exits');
+        }
+      }
 
-    if (existingUser) {
-      throw new Error('User with this email already exists');
+      const existingUser = await this.userModel.findOne({
+        userEmail: createUserDto.userEmail,
+      });
+      if (existingUser) {
+        throw new ConflictException('User with this email already exists');
+      }
+
+      // Hash password before saving
+      const hashedPassword = await bcrypt.hash(createUserDto.userPassword, 10);
+
+      // Create the new user with hashed password
+      const newUser = new this.userModel({
+        ...createUserDto,
+        userPassword: hashedPassword,
+      });
+
+      const user = await newUser.save();
+      return  new CustomResponse(200, 'success',user);
+    } catch (error) {
+      console.log('error',error)
+      throwException(error);
     }
-
-    // Hash password before saving
-    const hashedPassword = await bcrypt.hash(createUserDto.userPassword, 10);
-
-    // Create the new user with hashed password
-    const newUser = new this.userModel({
-      ...createUserDto,
-      userPassword: hashedPassword,
-    });
-
-    return await newUser.save();
   }
 
   // Find a user by phone number

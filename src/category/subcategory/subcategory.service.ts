@@ -6,8 +6,7 @@ import { CreateSubcategoryDTO, UpdateSubcategoryDTO } from '../dto/create-subcat
 import CustomResponse from 'src/common/providers/custom-response.service';
 import { throwException } from 'src/util/errorhandling';
 import { Category } from '../category.schema/category.schema'; // Corrected import path
-
-
+import { fileUpload } from 'src/util/fileupload';
 @Injectable()
 export class SubcategoryService {
   constructor(
@@ -16,10 +15,13 @@ export class SubcategoryService {
   ) { }
 
   private generateImageUrls(files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }, serverUrl: string) {
+  //   const fileName = fileUpload(ENTITY.USER, file);
+  //   updateUserDto['filePath'] =
+  //     process.env.SERVER_BASE_URL + `uploads/${ENTITY.USER}/${fileName}`;
+  // }
     const appImageUrls = files.app_image
       ? files.app_image.map(file => `${serverUrl}/uploads/${file.filename}`)
       : [];
-
     const webImageUrls = files.web_image
       ? files.web_image.map(file => `${serverUrl}/uploads/${file.filename}`)
       : [];
@@ -30,33 +32,33 @@ export class SubcategoryService {
   // Create Subcategory
   async createSubcategory(createSubcategoryDto: CreateSubcategoryDTO, files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }) {
     try {
-      const serverUrl = 'http://localhost:3000'; // Adjust for production URL
+      const serverUrl = 'http://147.93.103.99:8000/'; // Adjust for production URL
 
       // Check if Category exists
       const category = await this.categoryModel.findById(createSubcategoryDto.categoryId);
       if (!category) {
         throw new NotFoundException('Category not found');
       }
-      // const categoryBySlug = await this.categoryModel.findOne({ slug: createSubcategoryDto.slug });
-      // if (!categoryBySlug) {
-      //   throw new NotFoundException('Category with the specified slug not found');
-      // }
-
+      const categoryBySlug = await this.categoryModel.findOne({ slug: createSubcategoryDto.slug });
+      if (!categoryBySlug) {
+        throw new NotFoundException('Category with the specified slug not found');
+      }
+      //  console.log('files',files)
       // Generate image URLs
       const { appImageUrls, webImageUrls } = this.generateImageUrls(files, serverUrl);
 
       // Add these URLs to DTO before saving
       createSubcategoryDto.app_image = appImageUrls;
       createSubcategoryDto.web_image = webImageUrls;
-      console.log(createSubcategoryDto)
+     
       // Create the subcategory
-      const subcategory = new this.subcategoryModel(createSubcategoryDto);
+      // const subcategory = new this.subcategoryModel(createSubcategoryDto);
       // console.log('hiii',subcategory)
-      const subSave = await subcategory.save();
+      // const subSave = await subcategory.save();
       return new CustomResponse(
         HttpStatus.OK,
         'CreateSubcategory Save SuccessFully',
-        subSave
+        'kk'
       );
 
     } catch (error) {
@@ -67,7 +69,7 @@ export class SubcategoryService {
   // Update Subcategory
   async updateSubcategory(id: string, updateSubcategoryDto: UpdateSubcategoryDTO, files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }) {
     try {
-      const serverUrl = 'http://localhost:3000'; // Adjust for production URL
+      const serverUrl = 'http://147.93.103.99:8000/';; // Adjust for production URL
 
       // Check if Category exists
       const category = await this.categoryModel.findById(updateSubcategoryDto.categoryId);
@@ -144,16 +146,38 @@ export class SubcategoryService {
   async getSubcategoriesByCategoryId(categoryId: string) {
     try {
       // Check if the category exists
-      const category = await this.subcategoryModel.findById(categoryId);
-      if (!category) {
-        throw new NotFoundException('SubCategory Not Found ')
-      }
+      // const category = await this.subcategoryModel.findById(categoryId);
+      // if (!category) {
+      //   throw new NotFoundException('Category Not Found ')
+      // }
 
-      const subcategories = await this.subcategoryModel.findById(categoryId );
+      const subcategories = await this.subcategoryModel.find({ categoryId: categoryId });
       console.log(subcategories)
       return new CustomResponse(
         HttpStatus.OK,
         'Subcategory By Id  SuccessFully',
+        subcategories
+      );
+    } catch (error) {
+      throwException(error)
+    }
+  }
+  async getSubCategoryBySubcategoryID(id: string) {
+    try {
+      // Check if the category exists
+      const category = await this.subcategoryModel.findById(id);
+      if (!category) {
+        return new CustomResponse(
+          404,
+          'Not Found SubCategory',
+        );
+      }
+
+      const subcategories = await this.subcategoryModel.findOne({_id:id});
+      console.log('subcategory',subcategories)
+      return new CustomResponse(
+        HttpStatus.OK,
+        'All Subcategories get With Category Id',
         subcategories
       );
     } catch (error) {

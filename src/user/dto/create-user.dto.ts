@@ -23,7 +23,7 @@ export class CreateUserDto {
 
   otp: string;
 
-  userPassword: any;
+  userPassword: string;
   role: 'user' | 'admin';
   otpExpiration: { type: Date };
 }

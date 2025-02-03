@@ -17,14 +17,14 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: './.env' });
 @Module({
   imports: [ConfigModule.forRoot({}),
-  
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'), // Path to the folder containing the uploaded images
-    }),
-    
-    MongooseModule.forRoot(process.env.MONGO_URI as string, {}),
+
+  ServeStaticModule.forRoot({
+    rootPath: join(__dirname, '..', 'public'), // Path to the folder containing the uploaded images
+  }),
+
+  MongooseModule.forRoot(process.env.MONGO_URI as string, {}),
     AuthModule, UserModule, OrderModule, ProductModule, CategoryModule, RiderModule, MenuModule, BannerModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
