@@ -45,12 +45,4 @@ export class OrderController {
   async assignRider(@Param('orderId') orderId: string, @Body() body: { riderId: string }) {
     return this.orderService.assignRider(orderId, body.riderId);
   }
-//   async getOrderById(orderId: string): Promise<Order | null> {
-//     return this.orderModel.findById(orderId)
-//       .populate('userId')       // Populate user details
-//       .populate('products')     // Populate product details
-//       .populate('riderId')      // Populate rider details (if assigned)
-//       .exec();
-//   }
-  
 }

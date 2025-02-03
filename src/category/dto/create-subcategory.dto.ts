@@ -12,6 +12,7 @@ export class CreateSubcategoryDTO {
   userType: 'daily' | 'permanent';
   meta_title?: string;
   meta_description?: string;
+  is_published?: boolean; 
 }
 
 export class UpdateSubcategoryDTO {
@@ -27,4 +28,5 @@ export class UpdateSubcategoryDTO {
   userType?: 'daily' | 'permanent';
   meta_title?: string;
   meta_description?: string;
+  is_published?: boolean; 
 }

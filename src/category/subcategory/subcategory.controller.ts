@@ -2,7 +2,7 @@
 import { Controller, Post, Body, Param, Get, Put, Delete, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { SubcategoryService } from '../subcategory/subcategory.service';
 import { CreateSubcategoryDTO, UpdateSubcategoryDTO } from '../dto/create-subcategory.dto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express'; // Changed to FileFieldsInterceptor for multiple file upload
+import { AnyFilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express'; // Changed to FileFieldsInterceptor for multiple file upload
 import { multerOptions } from 'src/util/multiplefileupload';
 @Controller('subcategory')
 export class SubcategoryController {
@@ -10,13 +10,7 @@ export class SubcategoryController {
 
   @Post()
   @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'app_image', maxCount: 5 },
-        { name: 'web_image', maxCount: 5 },
-      ],
-      multerOptions
-    )
+ AnyFilesInterceptor()
   )
   async createSubcategory(
     @Body() createSubcategoryDto: CreateSubcategoryDTO,
@@ -26,14 +20,7 @@ export class SubcategoryController {
   }
 
   @Put('editSubCategory/:id')
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'app_image', maxCount: 5 },
-        { name: 'web_image', maxCount: 5 },
-      ],
-      multerOptions
-    )
+  @UseInterceptors(AnyFilesInterceptor()
   )
   async updateSubcategory(
     @Param('id') id: string,
@@ -43,7 +30,7 @@ export class SubcategoryController {
     return this.subcategoryService.updateSubcategory(id, updateSubcategoryDto, files);
   }
 
-  @Delete(':id')
+  @Delete('deleteSubCategory/:id')
   async deleteSubcategory(@Param('id') id: string) {
     return this.subcategoryService.deleteSubcategory(id);
   }
@@ -66,6 +53,12 @@ export class SubcategoryController {
   @Get('getSubcategoriesByCategoryId/:categoryId')
   async getSubcategoriesByCategoryId(@Param('categoryId') categoryId: string) {
     return this.subcategoryService.getSubcategoriesByCategoryId(categoryId);
+  }
+  @Get('getFilteredSubCategories')
+  async getCategories(
+    @Query() filterParams: Record<string, any>,  // Accept all query parameters as an object
+  ) {
+    return this.subcategoryService.getFilteredSubCategories(filterParams);
   }
   // @Get('category/:categoryId')
   // async getSubCategoryByCategoryId(@Param('categoryId') categoryId: string) {

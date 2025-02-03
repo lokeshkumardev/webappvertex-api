@@ -12,7 +12,7 @@ export class Subcategory {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
+  @Prop()
   slug: string;
 
   @Prop({ type: [String], required: false }) // Marked as optional
@@ -41,6 +41,9 @@ export class Subcategory {
 
   @Prop()
   meta_description: string;
+  
+  @Prop()
+  is_published?: boolean; 
 }
 
 // Export the Mongoose schema

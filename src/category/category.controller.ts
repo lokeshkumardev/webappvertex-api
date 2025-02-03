@@ -1,8 +1,8 @@
 // src/controllers/category.controller.ts
-import { Controller, Post, Body, Param, Put, Get, Delete, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Post, Body, Param,Query, Put, Get, Delete, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDTO, UpdateCategoryDTO } from '../category/dto/create-category.dto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor,FileFieldsInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/util/multiplefileupload';
 
 @Controller('category')
@@ -10,32 +10,15 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post('addCategory')
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'app_image', maxCount: 5 },
-        { name: 'web_image', maxCount: 5 },
-      ],
-      multerOptions
-    )
-  )
+  @UseInterceptors(AnyFilesInterceptor())
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDTO,
-    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }
-  ) {
+    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }) {
     return this.categoryService.createCategory(createCategoryDto, files);
   }
 
   @Put('editCategory/:id')
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'app_image', maxCount: 5 },
-        { name: 'web_image', maxCount: 5 },
-      ],
-      multerOptions
-    )
-  )
+  @UseInterceptors(AnyFilesInterceptor())
   async (
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDTO,
@@ -60,4 +43,11 @@ export class CategoryController {
   async getAllCategories() {
     return this.categoryService.getAllCategories();
   }
+  @Get('getFilteredCategories')
+  async getCategories(
+    @Query() filterParams: Record<string, any>,  // Accept all query parameters as an object
+  ) {
+    return this.categoryService.getFilteredCategories(filterParams);
+  }
 }
+  

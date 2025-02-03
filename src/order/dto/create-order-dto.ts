@@ -1,4 +1,4 @@
-import { IsString, IsArray, IsNumber, IsNotEmpty, IsMongoId } from 'class-validator';
+import { IsString, IsArray, IsNumber, IsNotEmpty, IsMongoId, IsOptional } from 'class-validator';
 
 export class CreateOrderDto {
   @IsMongoId()
@@ -19,4 +19,12 @@ export class CreateOrderDto {
   @IsArray()
   @IsMongoId({ each: true })
   products: string[];
+
+  @IsOptional()
+  @IsNumber()
+  specialOffer?: number;  // Optional: Special offer percentage
+
+  @IsOptional()
+  @IsNumber()
+  discount?: number;  // Optional: Discount percentage
 }
