@@ -59,16 +59,24 @@ export class SubcategoryService {
       if (!id || !updateSubcategoryDto || !files) {
         throw new NotFoundException(400, 'Missing required fields or files');
       }
-      const webImageFile = files.find(file => file.fieldname === 'web_image');
-      const appImageFile = files.find(file => file.fieldname === 'app_image');
-      const webImage = fileUpload('subcategory/webImage', webImageFile || null);
-      updateSubcategoryDto['web_image'] = webImage
-        ? [`${process.env.SERVER_BASE_URL}uploads/subcategory/webImage/${webImage}`]
-        : [];
-      const appImage = fileUpload('subcategory/appImage', appImageFile || null);
-      updateSubcategoryDto['app_image'] = appImage
-        ? [`${process.env.SERVER_BASE_URL}uploads/subcategory/appImage/${appImage}`]
-        : [];
+      if (files && files.length > 0) {
+        const webImageFile = files.find(file => file.fieldname === 'web_image');
+        if (webImageFile) {
+          const webImage = fileUpload('subcategory/webImage', webImageFile || null);
+          updateSubcategoryDto['web_image'] = webImage
+            ? [`${process.env.SERVER_BASE_URL}uploads/subcategory/webImage/${webImage}`]
+            : [];
+        }
+
+        const appImageFile = files.find(file => file.fieldname === 'app_image');
+        if (appImageFile) {
+          const appImage = fileUpload('subcategory/appImage', appImageFile || null);
+
+          updateSubcategoryDto['app_image'] = appImage
+            ? [`${process.env.SERVER_BASE_URL}uploads/subcategory/appImage/${appImage}`]
+            : [];
+        }
+      }
       const category = await this.categoryModel.findById(updateSubcategoryDto.categoryId);
       if (!category) {
         throw new NotFoundException('Category not found');
@@ -174,59 +182,59 @@ export class SubcategoryService {
       throwException(error)
     }
   }
-    async getFilteredSubCategories(filters: Record<string, any>) {
-      try {
-        const query: any = {};
-        // if (filters.id) {
-        //   // Convert 'id' to ObjectId only if it is a valid ObjectId string
-        //   if (Types.ObjectId.isValid(filters.id)) {
-        //     query._id = filters.id; // Only if the id is valid
-        //   } else {
-        //     throw new Error('Invalid ObjectId format');
-        //   }
-        // }
-        // Loop through each filter key and dynamically build the query
-        for (const [key, value] of Object.entries(filters)) {
-  
-  
-          if (value) {
-            // For boolean filters like is_published, public
-            if (key === 'is_published' || key === 'categoryId') {
-              query[key] = value;
-            }
-            // For ObjectId based filter (e.g., filtering by _id)
-            else if (key === 'id' && value) {
-              // Convert _id to ObjectId for comparison
-              query._id = new Types.ObjectId(value); // Convert string to ObjectId
-            }
-            // For date range filter (assuming filters contains date keys like 'startDate' and 'endDate')
-            else if (key === 'create_at' && value) {
-              query.createdAt = { $gte: new Date(value) }; // Greater than or equal to start date
-            } else if (key === 'update_at' && value) {
-              query.createdAt = { $lte: new Date(value) }; // Less than or equal to end date
-            }
-            // For text-based search like name, description, etc.
-            else {
-              query[key] = { $regex: value, $options: 'i' }; // Case-insensitive match
-            }
+  async getFilteredSubCategories(filters: Record<string, any>) {
+    try {
+      const query: any = {};
+      // if (filters.id) {
+      //   // Convert 'id' to ObjectId only if it is a valid ObjectId string
+      //   if (Types.ObjectId.isValid(filters.id)) {
+      //     query._id = filters.id; // Only if the id is valid
+      //   } else {
+      //     throw new Error('Invalid ObjectId format');
+      //   }
+      // }
+      // Loop through each filter key and dynamically build the query
+      for (const [key, value] of Object.entries(filters)) {
+
+
+        if (value) {
+          // For boolean filters like is_published, public
+          if (key === 'is_published' || key === 'categoryId') {
+            query[key] = value;
+          }
+          // For ObjectId based filter (e.g., filtering by _id)
+          else if (key === 'id' && value) {
+            // Convert _id to ObjectId for comparison
+            query._id = new Types.ObjectId(value); // Convert string to ObjectId
+          }
+          // For date range filter (assuming filters contains date keys like 'startDate' and 'endDate')
+          else if (key === 'create_at' && value) {
+            query.createdAt = { $gte: new Date(value) }; // Greater than or equal to start date
+          } else if (key === 'update_at' && value) {
+            query.createdAt = { $lte: new Date(value) }; // Less than or equal to end date
+          }
+          // For text-based search like name, description, etc.
+          else {
+            query[key] = { $regex: value, $options: 'i' }; // Case-insensitive match
           }
         }
-        // console.log('Filtered Categories:', query);
-        const filterQuery = await this.subcategoryModel.find(query).exec();
-  
-  
-        // Check if no data found, return custom response
-        if (filterQuery.length === 0) {
-          return new CustomResponse(404, 'Sub Category Not Found');
-        }
-  
-        // Return categories if found
-        return new CustomResponse(200, 'Sub Categories Retrieved Successfully', filterQuery);
-  
-      } catch (error) {
-        // Handle and throw the error
-        throwException(error);
       }
+      // console.log('Filtered Categories:', query);
+      const filterQuery = await this.subcategoryModel.find(query).exec();
+
+
+      // Check if no data found, return custom response
+      if (filterQuery.length === 0) {
+        return new CustomResponse(404, 'Sub Category Not Found');
+      }
+
+      // Return categories if found
+      return new CustomResponse(200, 'Sub Categories Retrieved Successfully', filterQuery);
+
+    } catch (error) {
+      // Handle and throw the error
+      throwException(error);
     }
+  }
 }
 

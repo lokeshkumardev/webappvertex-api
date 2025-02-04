@@ -13,4 +13,6 @@ export class UpdateBannerDto {
   @IsOptional()
   @IsUrl()
   bannerImage?: string;
+  web_image?:string;
+  app_image?:string;
 }

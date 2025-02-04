@@ -13,6 +13,12 @@ export class Banner extends Document {
   bannerImage: string;  // Make sure it's not readonly
 
   @Prop()
+  web_image: string;  // Make sure it's not readonly
+
+  @Prop()
+  app_image: string;  // Make sure it's not readonly
+
+  @Prop()
   createdAt: Date;
 }
 

@@ -61,19 +61,25 @@ export class CategoryService {
       if (!id || !updateCategoryDto || !files) {
         throw new NotFoundException(400, 'Missing required fields or files');
       }
+      if (files && files.length > 0) {
+        const webImageFile = files.find(file => file.fieldname === 'web_image');
+        if (webImageFile) {
+          const fileName = fileUpload('banners/webImage', webImageFile);
+          const webImage = fileUpload('category/webImage', webImageFile || null);
+          updateCategoryDto['web_image'] = webImage
+            ? [`${process.env.SERVER_BASE_URL}uploads/category/webImage/${webImage}`]
+            : [];
+        }
 
-      const webImageFile = files.find(file => file.fieldname === 'web_image');
-      const appImageFile = files.find(file => file.fieldname === 'app_image');
+        const appImageFile = files.find(file => file.fieldname === 'app_image');
+        if (appImageFile) {
+          const appImage = fileUpload('category/appImage', appImageFile || null);
 
-      // Upload files using your fileUpload function
-      const webImage = fileUpload('category/webImage', webImageFile || null);
-      updateCategoryDto['web_image'] = webImage
-        ? [`${process.env.SERVER_BASE_URL}uploads/category/webImage/${webImage}`]
-        : [];
-      const appImage = fileUpload('category/appImage', appImageFile || null);
-      updateCategoryDto['app_image'] = appImage
-        ? [`${process.env.SERVER_BASE_URL}uploads/category/appImage/${appImage}`]
-        : [];
+          updateCategoryDto['app_image'] = appImage
+            ? [`${process.env.SERVER_BASE_URL}uploads/category/appImage/${appImage}`]
+            : [];
+        }
+      }
       const updatedCategory = await this.categoryModel.findByIdAndUpdate(
         id,
         updateCategoryDto,

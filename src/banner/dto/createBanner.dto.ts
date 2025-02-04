@@ -8,6 +8,6 @@ export class CreateBannerDto {
   @IsString()
   @IsNotEmpty()
   description: string;
-
-  bannerImage: string;
+  app_image:string;
+  web_image:string;
 }
