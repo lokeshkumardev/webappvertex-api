@@ -13,6 +13,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MenuModule } from './menu/menu-item/menu.module';
 import { BannerModule } from './banner/banner.module';
+import { InventoryModule } from './inventory/inventory.module';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: './.env' });
 @Module({
@@ -23,7 +24,7 @@ dotenv.config({ path: './.env' });
   }),
 
   MongooseModule.forRoot(process.env.MONGO_URI as string, {}),
-    AuthModule, UserModule, OrderModule, ProductModule, CategoryModule, RiderModule, MenuModule, BannerModule],
+    AuthModule, UserModule, OrderModule, ProductModule, CategoryModule, RiderModule, MenuModule, BannerModule, InventoryModule],
   controllers: [AppController],
   providers: [AppService],
 })

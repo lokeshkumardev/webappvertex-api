@@ -8,19 +8,18 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   // Create a new order
-  @Post()
+  @Post('createOrder')
   async createOrder(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.createOrder(createOrderDto);
   }
-
   // Get order details by ID
-  @Get(':orderId')
+  @Get('getOrderById/:orderId')
   async getOrderById(@Param('orderId') orderId: string) {
     return this.orderService.getOrderById(orderId);
   }
 
   // Update order status (e.g., from "pending" to "delivered")
-  @Put('status/:orderId')
+  @Put('orderStatus/:orderId')
   async updateOrderStatus(
     @Param('orderId') orderId: string,
     @Body() body: { status: string },
@@ -29,13 +28,13 @@ export class OrderController {
   }
 
   // Get all orders by user
-  @Get('user/:userId')
+  @Get('getOrderByUser/:userId')
   async getOrdersByUser(@Param('userId') userId: string) {
     return this.orderService.getOrdersByUser(userId);
   }
 
   // Get orders by status (pending, delivered, etc.)
-  @Get('status/:status')
+  @Get('getOrderByStatus/:status')
   async getOrdersByStatus(@Param('status') status: string) {
     return this.orderService.getOrdersByStatus(status);
   }
