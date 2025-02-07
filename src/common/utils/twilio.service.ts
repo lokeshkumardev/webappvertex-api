@@ -28,7 +28,7 @@ export class TwilioService {
     const message = `Your OTP is ${otp}. Please use it to log in.`;
     await this.client.messages.create({
       body: message,
-      from: '+18454724893',
+      from:process.env.TWILIO_ACCOUNT_PHONE_NUMBER as string,
       to: phoneNumber,
     });
   }

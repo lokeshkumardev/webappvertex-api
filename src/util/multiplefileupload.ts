@@ -5,7 +5,7 @@ import { Request } from 'express';
 // Configure storage and file filter
 const storage = multer.diskStorage({
   destination: (req: Request, file: Express.Multer.File, cb: Function) => {
-    cb(null, 'uploads/'); // Save to 'uploads' folder
+    cb(null, 'public/uploads/'); // Save to 'uploads' folder
   },
   filename: (req: Request, file: Express.Multer.File, cb: Function) => {
     cb(null, Date.now() + path.extname(file.originalname)); // Unique filename

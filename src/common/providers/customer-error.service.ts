@@ -8,3 +8,4 @@ export default class CustomError {
     this.error = error;
   }
 }
+2
