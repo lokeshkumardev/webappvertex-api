@@ -63,7 +63,7 @@ export class AuthService {
     try {
       const userPhone = createUserDto.userPhone;
       const user = await this.userModel.findOne({ userPhone });
-
+         
       // Check if OTP matches and if it is not expired
       if (
         user &&
@@ -73,7 +73,8 @@ export class AuthService {
         return new CustomResponse(
           HttpStatus.OK,
           MESSAGE.OTP.VERIFY,
-          {'otp':createUserDto.otp}
+          user
+          
         );
       }
 
@@ -125,8 +126,6 @@ export class AuthService {
   async adminLogin(userEmail,userPassword): Promise<any> {
     try {
       const user = await this.userModel.findOne({ userEmail });
-      console.log('email',user);
-
       // Check if user exists and is an admin
       if (user && user.role !== 'user') {
         const isPasswordValid = await bcrypt.compare(userPassword, user.userPassword); // Compare hashed password
