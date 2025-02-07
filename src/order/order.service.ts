@@ -1,107 +1,113 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Order } from './order.schema/order.schema';
+import { CreateOrderDto } from './dto/create-order-dto';
+import { Subcategory } from 'src/category/category.schema/sub-category.schema'; // Import Subcategory model
 
 @Injectable()
 export class OrderService {
-  constructor(@InjectModel('Order') private orderModel: Model<Order>) {}
+  constructor(
+    @InjectModel('Order') private readonly orderModel: Model<Order>,
+    @InjectModel('Subcategory')
+    private readonly subcategoryModel: Model<Subcategory>, // Inject Subcategory model
+  ) {}
 
-  // Create a new order with all calculations
-  async createOrder(createOrderDto: any): Promise<Order> {
-    // Get the products and calculate the original price
-    const products = createOrderDto.products; // Assumes this is an array of product IDs
-    const originalPrice = await this.calculateTotalPrice(products);
+  /**
+   * Creates a new order with discount & offer calculations.
+   */
+  async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
+    const {
+      userId,
+      serviceType,
+      address,
+      subCategoryId,
+      specialOffer = 0,
+      discount = 0,
+      totalQuantity = 1,
+    } = createOrderDto;
 
-    // Apply discounts and special offers
-    const { discount, specialOffer } = createOrderDto; // Assuming the DTO includes discount & offer details
-    const finalPrice = this.calculateFinalPrice(originalPrice, discount, specialOffer);
+    // Fetch Subcategory details (price in this case)
+    const subcategory = await this.subcategoryModel.findById(subCategoryId);
+    if (!subcategory) {
+      throw new BadRequestException('Subcategory not found');
+    }
+
+    // Calculate total amount based on Subcategory price
+    const subCategoryPrice = subcategory.price; // Assuming price is available on Subcategory
+    const totalAmount = subCategoryPrice * totalQuantity; // Multiply by quantity
+
+    // Apply discounts & offers
+    const discountAmount = (totalAmount * discount) / 100;
+    const specialOfferAmount = (totalAmount * specialOffer) / 100;
+    const finalAmount = totalAmount - discountAmount - specialOfferAmount;
 
     const newOrder = new this.orderModel({
-      ...createOrderDto,
-      originalPrice,
-      finalPrice,
-      discount,
+      userId,
+      serviceType,
+      address,
+      totalAmount,
+      finalAmount,
+      totalQuantity,
       specialOffer,
-      offerDetails: this.getOfferDetails(specialOffer),
+      discount,
+      subCategoryId, // Save the subcategory reference
+      status: 'pending', // default status
     });
 
     return newOrder.save();
   }
 
-  // Calculate total price of products
-  private async calculateTotalPrice(productIds: string[]): Promise<number> {
-    // Assuming you have a product model and can calculate the total price of products
-    // const products = await this.getProductsByIds(productIds);
-    // const total = products.reduce((sum, product) => sum + product.price, 0);
-    const total=0;
-    return total;
-  }
-
-  // Get product details by their IDs
-  // private async getProductsByIds(productIds: string[]): Promise<any[]> {
-  //   // Assuming you have a Product service or model to fetch products by their IDs
-  //   return await this.productModel.find({ '_id': { $in: productIds } });
-  // }
-
-  // Calculate the final price after applying the discount and special offers
-  private calculateFinalPrice(originalPrice: number, discount: number, specialOffer: string): number {
-    let priceAfterDiscount = originalPrice - (originalPrice * (discount / 100));
-    // If there's a special offer, apply it
-    if (specialOffer === 'NEWYEAR2025') {
-      // Example of a specific special offer
-      priceAfterDiscount -= 10; // Fixed $10 off for the New Year special offer
-    }
-    return Math.max(priceAfterDiscount, 0); // Ensure final price is not negative
-  }
-
-  // Get offer details (e.g., promo code details)
-  private getOfferDetails(offerCode: string) {
-    if (offerCode === 'NEWYEAR2025') {
-      return { code: offerCode, description: 'New Year 2025 Offer: $10 off on orders above $50.' };
-    }
-    return null;
-  }
-
-  // Get order by ID
-  async getOrderById(orderId: string): Promise<Order | null> {
+  /**
+   * Fetch all orders with populated references.
+   */
+  async getAllOrders(): Promise<Order[]> {
     return this.orderModel
+      .find()
+      .populate('userId subCategoryId') // Populate subCategoryId to get Subcategory details
+      .exec();
+  }
+
+  /**
+   * Fetch a single order by ID with populated references.
+   */
+  async getOrderById(orderId: string): Promise<Order> {
+    const order = await this.orderModel
       .findById(orderId)
-      .populate('userId')
-      .populate('products')
-      .populate('riderId')
+      .populate('userId subCategoryId') // Populate subCategoryId to get Subcategory details
       .exec();
+    if (!order) throw new NotFoundException('Order not found');
+    return order;
   }
 
-  // Get all orders for a user
-  async getOrdersByUser(userId: string): Promise<Order[]> {
-    return this.orderModel
-      .find({ userId })
-      .populate('products')
-      .populate('riderId')
-      .exec();
+  /**
+   * Update an order status.
+   */
+  async updateOrderStatus(orderId: string, status: string): Promise<Order> {
+    // Validate the status
+    const allowedStatuses = ['pending', 'in_progress', 'completed'];
+    if (!allowedStatuses.includes(status)) {
+      throw new BadRequestException('Invalid status value');
+    }
+
+    const order = await this.orderModel.findById(orderId);
+    if (!order) throw new NotFoundException('Order not found');
+
+    order.status = status;
+    return order.save();
   }
 
-  // Update the status of an order
-  async updateOrderStatus(orderId: string, status: string): Promise<Order | null> {
-    return this.orderModel
-      .findByIdAndUpdate(orderId, { status }, { new: true })
-      .exec();
-  }
+  /**
+   * Delete an order by ID.
+   */
+  async deleteOrder(orderId: string): Promise<{ message: string }> {
+    const result = await this.orderModel.findByIdAndDelete(orderId);
+    if (!result) throw new NotFoundException('Order not found');
 
-  // Assign a rider to an order
-  async assignRider(orderId: string, riderId: string): Promise<Order | null> {
-    return this.orderModel
-      .findByIdAndUpdate(orderId, { riderId }, { new: true })
-      .exec();
-  }
-
-  // Get all orders with a particular status
-  async getOrdersByStatus(status: string): Promise<Order[]> {
-    return this.orderModel
-      .find({ status })
-      .populate('products')
-      .populate('riderId')
-      .exec();
+    return { message: 'Order deleted successfully' };
   }
 }

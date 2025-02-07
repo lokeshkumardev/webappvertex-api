@@ -1,17 +1,17 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SubcategoryController } from './subcategory.controller';
 import { SubcategoryService } from './subcategory.service';
 import { SubcategorySchema } from '../category.schema/sub-category.schema';
 import { CategoryModule } from '../category.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Subcategory', schema: SubcategorySchema }]),
-    forwardRef(() => CategoryModule), // Resolves circular dependency
+    MongooseModule.forFeature([
+      { name: 'Subcategory', schema: SubcategorySchema },
+    ]),
+    forwardRef(() => CategoryModule), // Fix circular dependency issue
   ],
-  controllers: [SubcategoryController],
   providers: [SubcategoryService],
-  exports: [SubcategoryService],
+  exports: [SubcategoryService, MongooseModule],
 })
 export class SubcategoryModule {}

@@ -1,7 +1,7 @@
-import { IsString, IsArray, IsNumber, IsNotEmpty, IsMongoId, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateOrderDto {
-  @IsMongoId()
+  @IsString()
   @IsNotEmpty()
   userId: string;
 
@@ -9,22 +9,23 @@ export class CreateOrderDto {
   @IsNotEmpty()
   serviceType: string;
 
-  @IsNumber()
-  totalAmount: number;
-
   @IsString()
   @IsNotEmpty()
   address: string;
 
-  @IsArray()
-  @IsMongoId({ each: true })
-  products: string[];
+  @IsString()
+  @IsNotEmpty()
+  subCategoryId: string; // This references the Subcategory
 
   @IsOptional()
   @IsNumber()
-  specialOffer?: number;  // Optional: Special offer percentage
+  specialOffer?: number; // Percentage, default 0
 
   @IsOptional()
   @IsNumber()
-  discount?: number;  // Optional: Discount percentage
+  discount?: number; // Percentage, default 0
+
+  @IsOptional()
+  @IsNumber()
+  totalQuantity?: number; // Default is 1
 }

@@ -1,47 +1,62 @@
-import { Controller, Post, Body, Get, Param, Put } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Patch,
+  Delete,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order-dto';
-import { ROUTE } from 'src/util/constants';
+import { Order } from './order.schema/order.schema';
 
-@Controller(ROUTE.ORDER)
+@Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  // Create a new order
-  @Post('createOrder')
-  async createOrder(@Body() createOrderDto: CreateOrderDto) {
+  /**
+   * Creates a new order.
+   */
+  @Post()
+  async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
     return this.orderService.createOrder(createOrderDto);
   }
-  // Get order details by ID
-  @Get('getOrderById/:orderId')
-  async getOrderById(@Param('orderId') orderId: string) {
+
+  /**
+   * Fetch all orders.
+   */
+  @Get()
+  async getAllOrders(): Promise<Order[]> {
+    return this.orderService.getAllOrders();
+  }
+
+  /**
+   * Fetch a single order by ID.
+   */
+  @Get(':id')
+  async getOrderById(@Param('id') orderId: string): Promise<Order> {
     return this.orderService.getOrderById(orderId);
   }
 
-  // Update order status (e.g., from "pending" to "delivered")
-  @Put('orderStatus/:orderId')
+  /**
+   * Update the order status.
+   */
+  @Patch(':id/status')
   async updateOrderStatus(
-    @Param('orderId') orderId: string,
-    @Body() body: { status: string },
-  ) {
-    return this.orderService.updateOrderStatus(orderId, body.status);
+    @Param('id') orderId: string,
+    @Body('status') status: string,
+  ): Promise<Order> {
+    return this.orderService.updateOrderStatus(orderId, status);
   }
 
-  // Get all orders by user
-  @Get('getOrderByUser/:userId')
-  async getOrdersByUser(@Param('userId') userId: string) {
-    return this.orderService.getOrdersByUser(userId);
-  }
-
-  // Get orders by status (pending, delivered, etc.)
-  @Get('getOrderByStatus/:status')
-  async getOrdersByStatus(@Param('status') status: string) {
-    return this.orderService.getOrdersByStatus(status);
-  }
-
-  // Assign a rider to an order
-  @Put('assign-rider/:orderId')
-  async assignRider(@Param('orderId') orderId: string, @Body() body: { riderId: string }) {
-    return this.orderService.assignRider(orderId, body.riderId);
+  /**
+   * Delete an order by ID.
+   */
+  @Delete(':id')
+  async deleteOrder(
+    @Param('id') orderId: string,
+  ): Promise<{ message: string }> {
+    return this.orderService.deleteOrder(orderId);
   }
 }
