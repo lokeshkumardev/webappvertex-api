@@ -39,7 +39,6 @@ export class CategoryController {
 
   // New endpoint to get all categories
   @Get('getAllCategory')
-
   async getAllCategories() {
     return this.categoryService.getAllCategories();
   }
