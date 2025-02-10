@@ -1,19 +1,27 @@
 // src/services/category.service.ts
-import { Injectable, HttpException, NotFoundException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  NotFoundException,
+  HttpStatus,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Category } from '../category/category.schema/category.schema';
-import { CreateCategoryDTO, UpdateCategoryDTO } from '../category/dto/create-category.dto';
+import {
+  CreateCategoryDTO,
+  UpdateCategoryDTO,
+} from '../category/dto/create-category.dto';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import { throwException } from 'src/util/errorhandling';
 import { fileUpload } from 'src/util/fileupload';
-import { error } from 'console';
+// import { error } from 'console';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectModel('Category') private categoryModel: Model<Category>,
-  ) { }
+  ) {}
 
   async createCategory(createCategoryDto: CreateCategoryDTO, files: any) {
     try {
@@ -23,25 +31,35 @@ export class CategoryService {
           'Missing required fields or files',
         );
       }
-      const webImageFile = files.find(file => file.fieldname === 'web_image');
-      const appImageFile = files.find(file => file.fieldname === 'app_image');
+      const webImageFile = files.find((file) => file.fieldname === 'web_image');
+      const appImageFile = files.find((file) => file.fieldname === 'app_image');
 
       // Upload files using your fileUpload function
       const webImage = fileUpload('category/webImage', webImageFile || null);
 
       createCategoryDto['web_image'] = webImage
-        ? [`${process.env.SERVER_BASE_URL}uploads/category/webImage/${webImage}`]
+        ? [
+            `${process.env.SERVER_BASE_URL}uploads/category/webImage/${webImage}`,
+          ]
         : [];
       const appImage = fileUpload('category/appImage', appImageFile || null);
       createCategoryDto['app_image'] = appImage
-        ? [`${process.env.SERVER_BASE_URL}uploads/category/appImage/${appImage}`]
+        ? [
+            `${process.env.SERVER_BASE_URL}uploads/category/appImage/${appImage}`,
+          ]
         : [];
       const existingCategory = await this.categoryModel.findOne({
-        $or: [{ name: createCategoryDto.name }, { slug: createCategoryDto.slug }],
+        $or: [
+          { name: createCategoryDto.name },
+          { slug: createCategoryDto.slug },
+        ],
       });
 
       if (existingCategory) {
-        throw new NotFoundException('Category with the same name or slug already exists');
+        throw new CustomResponse(
+          403,
+          'Category with the same name or slug already exists',
+        );
       }
 
       const category = new this.categoryModel(createCategoryDto);
@@ -49,45 +67,63 @@ export class CategoryService {
       return new CustomResponse(
         HttpStatus.OK,
         'Category Save Successfully',
-        categorySave
+        categorySave,
       );
     } catch (error) {
       throwException(error);
     }
   }
 
-  async updateCategory(id: string, updateCategoryDto: UpdateCategoryDTO, files: any) {
+  async updateCategory(
+    id: string,
+    updateCategoryDto: UpdateCategoryDTO,
+    files: any,
+  ) {
     try {
       if (!id || !updateCategoryDto || !files) {
-        throw new NotFoundException(400, 'Missing required fields or files');
+        throw new CustomResponse(400, 'Missing required fields or files');
       }
       if (files && files.length > 0) {
-        const webImageFile = files.find(file => file.fieldname === 'web_image');
+        const webImageFile = files.find(
+          (file) => file.fieldname === 'web_image',
+        );
         if (webImageFile) {
           const fileName = fileUpload('banners/webImage', webImageFile);
-          const webImage = fileUpload('category/webImage', webImageFile || null);
+          const webImage = fileUpload(
+            'category/webImage',
+            webImageFile || null,
+          );
           updateCategoryDto['web_image'] = webImage
-            ? [`${process.env.SERVER_BASE_URL}uploads/category/webImage/${webImage}`]
+            ? [
+                `${process.env.SERVER_BASE_URL}uploads/category/webImage/${webImage}`,
+              ]
             : [];
         }
 
-        const appImageFile = files.find(file => file.fieldname === 'app_image');
+        const appImageFile = files.find(
+          (file) => file.fieldname === 'app_image',
+        );
         if (appImageFile) {
-          const appImage = fileUpload('category/appImage', appImageFile || null);
+          const appImage = fileUpload(
+            'category/appImage',
+            appImageFile || null,
+          );
 
           updateCategoryDto['app_image'] = appImage
-            ? [`${process.env.SERVER_BASE_URL}uploads/category/appImage/${appImage}`]
+            ? [
+                `${process.env.SERVER_BASE_URL}uploads/category/appImage/${appImage}`,
+              ]
             : [];
         }
       }
       const updatedCategory = await this.categoryModel.findByIdAndUpdate(
         id,
         updateCategoryDto,
-        { new: true }
+        { new: true },
       );
 
       if (!updatedCategory) {
-        throw new NotFoundException(404, 'Category not found');
+        throw new CustomResponse(404, 'Category not found');
       }
 
       const updatCat = await updatedCategory.save();
@@ -113,7 +149,7 @@ export class CategoryService {
       return new CustomResponse(
         HttpStatus.OK,
         'Category Delete SuccessFully',
-        deletedCategory
+        deletedCategory,
       );
     } catch (error) {
       throwException(error);
@@ -124,10 +160,12 @@ export class CategoryService {
   async getCategoryById(id: string) {
     try {
       const category = await this.categoryModel.findById(id);
+      // console.log('Category is', category);
 
       if (!category) {
-        throw new NotFoundException(404, 'Category not found');
+        throw new CustomResponse(404, 'Category not found');
       }
+      // console.log('Category is', category);
 
       return new CustomResponse(HttpStatus.OK, 'Category found', category);
     } catch (error) {
@@ -163,8 +201,6 @@ export class CategoryService {
       // }
       // Loop through each filter key and dynamically build the query
       for (const [key, value] of Object.entries(filters)) {
-
-
         if (value) {
           // For boolean filters like is_published, public
           if (key === 'is_published' || key === 'public') {
@@ -187,11 +223,10 @@ export class CategoryService {
           }
         }
       }
-      console.log('Filtering by', query);
+      // console.log('Filtering by', query);
       // Execute the query
       // console.log('Filtered Categories:', query);
       const filterQuery = await this.categoryModel.find(query).exec();
-
 
       // Check if no data found, return custom response
       if (filterQuery.length === 0) {
@@ -199,12 +234,14 @@ export class CategoryService {
       }
 
       // Return categories if found
-      return new CustomResponse(200, 'Categories Retrieved Successfully', filterQuery);
-
+      return new CustomResponse(
+        200,
+        'Categories Retrieved Successfully',
+        filterQuery,
+      );
     } catch (error) {
       // Handle and throw the error
       throwException(error);
     }
   }
-
 }

@@ -1,33 +1,62 @@
 // src/controllers/subcategory.controller.ts
-import { Controller, Post, Body, Param, Get, Put, Delete, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Get,
+  Put,
+  Delete,
+  Query,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
 import { SubcategoryService } from '../subcategory/subcategory.service';
-import { CreateSubcategoryDTO, UpdateSubcategoryDTO } from '../dto/create-subcategory.dto';
-import { AnyFilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express'; // Changed to FileFieldsInterceptor for multiple file upload
+import {
+  CreateSubcategoryDTO,
+  UpdateSubcategoryDTO,
+} from '../dto/create-subcategory.dto';
+import {
+  AnyFilesInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express'; // Changed to FileFieldsInterceptor for multiple file upload
 import { multerOptions } from 'src/util/multiplefileupload';
 @Controller('subcategory')
 export class SubcategoryController {
   constructor(private readonly subcategoryService: SubcategoryService) {}
 
   @Post()
-  @UseInterceptors(
- AnyFilesInterceptor()
-  )
+  @UseInterceptors(AnyFilesInterceptor())
   async createSubcategory(
     @Body() createSubcategoryDto: CreateSubcategoryDTO,
-    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }
+    @UploadedFiles()
+    files: {
+      app_image?: Express.Multer.File[];
+      web_image?: Express.Multer.File[];
+    },
   ) {
-    return this.subcategoryService.createSubcategory(createSubcategoryDto, files);
+    return this.subcategoryService.createSubcategory(
+      createSubcategoryDto,
+      files,
+    );
   }
 
   @Put('editSubCategory/:id')
-  @UseInterceptors(AnyFilesInterceptor()
-  )
+  @UseInterceptors(AnyFilesInterceptor())
   async updateSubcategory(
     @Param('id') id: string,
     @Body() updateSubcategoryDto: UpdateSubcategoryDTO,
-    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }
+    @UploadedFiles()
+    files: {
+      app_image?: Express.Multer.File[];
+      web_image?: Express.Multer.File[];
+    },
   ) {
-    return this.subcategoryService.updateSubcategory(id, updateSubcategoryDto, files);
+    return this.subcategoryService.updateSubcategory(
+      id,
+      updateSubcategoryDto,
+      files,
+    );
   }
 
   @Delete('deleteSubCategory/:id')
@@ -36,7 +65,9 @@ export class SubcategoryController {
   }
 
   @Get('getCategoryByUserType')
-  async getSubcategoriesByUserType(@Query('userType') userType: 'daily' | 'permanent') {
+  async getSubcategoriesByUserType(
+    @Query('userType') userType: 'daily' | 'permanent',
+  ) {
     return this.subcategoryService.getSubcategoriesByUserType(userType);
   }
 
@@ -46,7 +77,7 @@ export class SubcategoryController {
     return this.subcategoryService.getAllSubcategories();
   }
   @Get('getSubCategoryBySubcategoryID/:id')
-  async getSubCategoryBySubcategoryID(@Param('id') id:string) {
+  async getSubCategoryBySubcategoryID(@Param('id') id: string) {
     return this.subcategoryService.getSubCategoryBySubcategoryID(id);
   }
   // New endpoint to get subcategories by categoryId
@@ -56,7 +87,7 @@ export class SubcategoryController {
   }
   @Get('getFilteredSubCategories')
   async getCategories(
-    @Query() filterParams: Record<string, any>,  // Accept all query parameters as an object
+    @Query() filterParams: Record<string, any>, // Accept all query parameters as an object
   ) {
     return this.subcategoryService.getFilteredSubCategories(filterParams);
   }
@@ -65,5 +96,3 @@ export class SubcategoryController {
   //   return this.subcategoryService.getSubcategoriesByCategoryId(categoryId);
   // }
 }
-
-
