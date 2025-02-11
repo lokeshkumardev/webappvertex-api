@@ -1,11 +1,26 @@
-import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsString, IsNumber, IsOptional, Min, IsEnum } from 'class-validator';
+import { StockStatus } from './create-inventory.dto'; // Assuming the enum is defined there
 
 export class UpdateInventoryDto {
-  name: string;
+  @IsOptional()
+  @IsString()
+  name?: string;
 
-  quantity: number;
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  quantity?: number;
 
+  @IsOptional()
+  @IsString()
   description?: string;
 
-  price: number;
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price?: number;
+
+  @IsOptional()
+  @IsEnum(StockStatus)
+  status?: StockStatus;
 }
