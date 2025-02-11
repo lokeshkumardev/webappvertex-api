@@ -8,6 +8,8 @@ import { Model } from 'mongoose';
 import { Order } from './order.schema/order.schema';
 import { CreateOrderDto } from './dto/create-order-dto';
 import { Subcategory } from 'src/category/category.schema/sub-category.schema'; // Import Subcategory model
+import CustomResponse from 'src/common/providers/custom-response.service';
+import CustomError from 'src/common/providers/customer-error.service';
 
 @Injectable()
 export class OrderService {
@@ -20,7 +22,7 @@ export class OrderService {
   /**
    * Creates a new order with discount & offer calculations.
    */
-  async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
+  async createOrder(createOrderDto: CreateOrderDto) {
     const {
       userId,
       serviceType,
@@ -34,7 +36,7 @@ export class OrderService {
     // Fetch Subcategory details (price in this case)
     const subcategory = await this.subcategoryModel.findById(subCategoryId);
     if (!subcategory) {
-      throw new BadRequestException('Subcategory not found');
+      throw new CustomResponse(404, 'Subcategory is required');
     }
 
     // Calculate total amount based on Subcategory price
@@ -58,47 +60,59 @@ export class OrderService {
       subCategoryId, // Save the subcategory reference
       status: 'pending', // default status
     });
+    if (!userId) {
+      return new CustomResponse(404, 'userId is required');
+    }
 
-    return newOrder.save();
+    const savedOrder = await newOrder.save();
+
+    return new CustomResponse(200, 'Order Created Successfully', savedOrder);
   }
 
   /**
    * Fetch all orders with populated references.
    */
-  async getAllOrders(): Promise<Order[]> {
-    return this.orderModel
-      .find()
-      .populate('userId subCategoryId') // Populate subCategoryId to get Subcategory details
-      .exec();
+  async getAllOrders() {
+    try {
+      const orders = await this.orderModel
+        .find()
+        .populate('userId subCategoryId') // Populate subCategoryId to get Subcategory details
+        .exec();
+      return new CustomResponse(
+        200,
+        'All Order Retrieved Successfully',
+        orders,
+      );
+    } catch (error) {
+      throw new CustomError(error);
+    }
   }
-
   /**
    * Fetch a single order by ID with populated references.
    */
-  async getOrderById(orderId: string): Promise<Order> {
-    const order = await this.orderModel
-      .findById(orderId)
-      .populate('userId subCategoryId') // Populate subCategoryId to get Subcategory details
-      .exec();
-    if (!order) throw new NotFoundException('Order not found');
-    return order;
+  async getOrderById(orderId: string) {
+    const order = await this.orderModel.findById(orderId);
+    if (!order) throw new CustomError(404, 'Order not found');
+    return new CustomResponse(200, 'order successfully fetched by id', order);
   }
 
   /**
    * Update an order status.
    */
   async updateOrderStatus(orderId: string, status: string): Promise<Order> {
-    // Validate the status
+    // Allowed statuses validation
     const allowedStatuses = ['pending', 'in_progress', 'completed'];
     if (!allowedStatuses.includes(status)) {
-      throw new BadRequestException('Invalid status value');
+      throw new CustomError(400, 'Invalid status value');
     }
 
+    // Find and update the order
     const order = await this.orderModel.findById(orderId);
-    if (!order) throw new NotFoundException('Order not found');
+    if (!order) throw new CustomError(404, 'Order not found');
 
     order.status = status;
-    return order.save();
+    await order.save();
+    return order;
   }
 
   /**
@@ -106,8 +120,8 @@ export class OrderService {
    */
   async deleteOrder(orderId: string): Promise<{ message: string }> {
     const result = await this.orderModel.findByIdAndDelete(orderId);
-    if (!result) throw new NotFoundException('Order not found');
+    if (!result) throw new CustomError(404, 'Order not found');
 
-    return { message: 'Order deleted successfully' };
+    return new CustomResponse(200, 'Order deleted successfully', result);
   }
 }

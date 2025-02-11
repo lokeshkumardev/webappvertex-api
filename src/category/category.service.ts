@@ -179,7 +179,7 @@ export class CategoryService {
       const categories = await this.categoryModel.find();
 
       if (!categories || categories.length === 0) {
-        throw new NotFoundException(404, 'No categories found');
+        throw new CustomResponse(404, 'No categories found');
       }
 
       return new CustomResponse(HttpStatus.OK, 'Categories found', categories);

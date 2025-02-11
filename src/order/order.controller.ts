@@ -19,7 +19,7 @@ export class OrderController {
    * Creates a new order.
    */
   @Post()
-  async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
+  async createOrder(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.createOrder(createOrderDto);
   }
 
@@ -27,7 +27,7 @@ export class OrderController {
    * Fetch all orders.
    */
   @Get()
-  async getAllOrders(): Promise<Order[]> {
+  async getAllOrders() {
     return this.orderService.getAllOrders();
   }
 
@@ -35,7 +35,7 @@ export class OrderController {
    * Fetch a single order by ID.
    */
   @Get(':id')
-  async getOrderById(@Param('id') orderId: string): Promise<Order> {
+  async getOrderById(@Param('id') orderId: string) {
     return this.orderService.getOrderById(orderId);
   }
 
@@ -46,8 +46,16 @@ export class OrderController {
   async updateOrderStatus(
     @Param('id') orderId: string,
     @Body('status') status: string,
-  ): Promise<Order> {
-    return this.orderService.updateOrderStatus(orderId, status);
+  ): Promise<{ success: boolean; message: string; data?: Order }> {
+    const updatedOrder = await this.orderService.updateOrderStatus(
+      orderId,
+      status,
+    );
+    return {
+      success: true,
+      message: 'Order status updated successfully',
+      data: updatedOrder,
+    };
   }
 
   /**

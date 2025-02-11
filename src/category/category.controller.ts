@@ -1,8 +1,25 @@
 // src/controllers/category.controller.ts
-import { Controller, Post, Body, Param,Query, Put, Get, Delete, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Query,
+  Put,
+  Get,
+  Delete,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CreateCategoryDTO, UpdateCategoryDTO } from '../category/dto/create-category.dto';
-import { AnyFilesInterceptor,FileFieldsInterceptor } from '@nestjs/platform-express';
+import {
+  CreateCategoryDTO,
+  UpdateCategoryDTO,
+} from '../category/dto/create-category.dto';
+import {
+  AnyFilesInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import { multerOptions } from 'src/util/multiplefileupload';
 
 @Controller('category')
@@ -13,16 +30,25 @@ export class CategoryController {
   @UseInterceptors(AnyFilesInterceptor())
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDTO,
-    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }) {
+    @UploadedFiles()
+    files: {
+      app_image?: Express.Multer.File[];
+      web_image?: Express.Multer.File[];
+    },
+  ) {
     return this.categoryService.createCategory(createCategoryDto, files);
   }
 
   @Put('editCategory/:id')
   @UseInterceptors(AnyFilesInterceptor())
-  async (
+  async(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDTO,
-    @UploadedFiles() files: { app_image?: Express.Multer.File[]; web_image?: Express.Multer.File[] }
+    @UploadedFiles()
+    files: {
+      app_image?: Express.Multer.File[];
+      web_image?: Express.Multer.File[];
+    },
   ) {
     return this.categoryService.updateCategory(id, updateCategoryDto, files);
   }
@@ -44,9 +70,8 @@ export class CategoryController {
   }
   @Get('getFilteredCategories')
   async getCategories(
-    @Query() filterParams: Record<string, any>,  // Accept all query parameters as an object
+    @Query() filterParams: Record<string, any>, // Accept all query parameters as an object
   ) {
     return this.categoryService.getFilteredCategories(filterParams);
   }
 }
-  

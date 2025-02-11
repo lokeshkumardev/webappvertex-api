@@ -12,6 +12,7 @@ import { SubcategoryController } from './subcategory.controller';
     ]),
     forwardRef(() => CategoryModule), // Fix circular dependency issue
   ],
+  controllers: [SubcategoryController],
   providers: [SubcategoryService],
   exports: [SubcategoryService, MongooseModule],
   controllers:[SubcategoryController]
