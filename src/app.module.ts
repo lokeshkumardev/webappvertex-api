@@ -25,18 +25,8 @@ dotenv.config({ path: './.env' });
       rootPath: join(__dirname, '..', 'public'), // Path to the folder containing the uploaded images
     }),
 
-    MongooseModule.forRoot(process.env.MONGO_URI as string, {}),
-    AuthModule,
-    UserModule,
-    OrderModule,
-    SubcategoryModule,
-    ProductModule,
-    CategoryModule,
-    RiderModule,
-    MenuModule,
-    BannerModule,
-    InventoryModule,
-  ],
+  MongooseModule.forRoot(process.env.MONGO_URI as string, {}),
+    AuthModule, UserModule, OrderModule, ProductModule, CategoryModule,SubcategoryModule, RiderModule, MenuModule, BannerModule, InventoryModule],
   controllers: [AppController],
   providers: [AppService],
 })
