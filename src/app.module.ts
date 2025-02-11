@@ -16,6 +16,7 @@ import { BannerModule } from './banner/banner.module';
 import { InventoryModule } from './inventory/inventory.module';
 import * as dotenv from 'dotenv';
 import { SubcategoryModule } from './category/subcategory/subcategory.module';
+import { APP_FILTER } from '@nestjs/core';
 dotenv.config({ path: './.env' });
 @Module({
   imports: [
