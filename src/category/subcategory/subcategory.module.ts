@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { SubcategoryService } from './subcategory.service';
 import { SubcategorySchema } from '../category.schema/sub-category.schema';
 import { CategoryModule } from '../category.module';
+import { SubcategoryController } from './subcategory.controller';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { CategoryModule } from '../category.module';
     ]),
     forwardRef(() => CategoryModule), // Fix circular dependency issue
   ],
+  controllers: [SubcategoryController],
   providers: [SubcategoryService],
   exports: [SubcategoryService, MongooseModule],
 })

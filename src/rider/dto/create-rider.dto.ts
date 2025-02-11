@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsPhoneNumber, IsDate, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsDate,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateRiderDto {
   @IsString()
@@ -52,6 +58,8 @@ export class CreateRiderDto {
   @IsString()
   @IsOptional()
   refferalCode: string;
+
+  userType: string;
 
   @IsString()
   @IsOptional()

@@ -15,17 +15,29 @@ import { MenuModule } from './menu/menu-item/menu.module';
 import { BannerModule } from './banner/banner.module';
 import { InventoryModule } from './inventory/inventory.module';
 import * as dotenv from 'dotenv';
+import { SubcategoryModule } from './category/subcategory/subcategory.module';
 dotenv.config({ path: './.env' });
 @Module({
-  imports: [ConfigModule.forRoot({}),
+  imports: [
+    ConfigModule.forRoot({}),
 
-  ServeStaticModule.forRoot({
-    rootPath: join(__dirname, '..', 'public'), // Path to the folder containing the uploaded images
-  }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'), // Path to the folder containing the uploaded images
+    }),
 
-  MongooseModule.forRoot(process.env.MONGO_URI as string, {}),
-    AuthModule, UserModule, OrderModule, ProductModule, CategoryModule, RiderModule, MenuModule, BannerModule, InventoryModule],
+    MongooseModule.forRoot(process.env.MONGO_URI as string, {}),
+    AuthModule,
+    UserModule,
+    OrderModule,
+    SubcategoryModule,
+    ProductModule,
+    CategoryModule,
+    RiderModule,
+    MenuModule,
+    BannerModule,
+    InventoryModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

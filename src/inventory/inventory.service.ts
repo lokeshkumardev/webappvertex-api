@@ -65,6 +65,7 @@ export class InventoryService {
       const updatedItem = await this.inventoryModel
         .findByIdAndUpdate(id, data, { new: true })
         .exec();
+
       if (!updatedItem)
         throw new CustomResponse(404, 'Inventory item not found');
       return new CustomResponse(

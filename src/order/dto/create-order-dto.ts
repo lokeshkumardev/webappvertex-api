@@ -1,8 +1,8 @@
 import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateOrderDto {
-  @IsString()
-  @IsNotEmpty()
+  // @IsString()
+  // @IsNotEmpty()
   userId: string;
 
   @IsString()
@@ -13,8 +13,8 @@ export class CreateOrderDto {
   @IsNotEmpty()
   address: string;
 
-  @IsString()
-  @IsNotEmpty()
+  // @IsString()
+  // @IsNotEmpty()
   subCategoryId: string; // This references the Subcategory
 
   @IsOptional()

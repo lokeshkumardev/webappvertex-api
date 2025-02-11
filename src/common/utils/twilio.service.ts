@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as twilio from 'twilio';
 import * as dotenv from 'dotenv';
+import CustomError from '../providers/customer-error.service';
 dotenv.config({ path: './.env' });
 
 @Injectable()
@@ -11,16 +12,13 @@ export class TwilioService {
     // console.log('Starting', process.env)
     const accountSid = process.env.TWILIO_ACCOUNT_SID as string; // Make sure this SID is correct
     const authToken = process.env.TWILIO_AUTH_TOKEN as string; // Make sure this Auth Token is correct
+    console.log('accountSid is: ', accountSid);
 
     if (!accountSid || !authToken) {
-      throw new Error('Twilio SID or Auth Token is missing');
+      throw new CustomError(500, 'Twilio SID or Auth Token is missing');
     }
 
-    this.client = twilio(
-      accountSid,
-      authToken,
-    );
-
+    this.client = twilio(accountSid, authToken);
   }
 
   // Send OTP via Twilio SMS
@@ -28,7 +26,7 @@ export class TwilioService {
     const message = `Your OTP is ${otp}. Please use it to log in.`;
     await this.client.messages.create({
       body: message,
-      from:process.env.TWILIO_ACCOUNT_PHONE_NUMBER as string,
+      from: process.env.TWILIO_ACCOUNT_PHONE_NUMBER as string,
       to: phoneNumber,
     });
   }

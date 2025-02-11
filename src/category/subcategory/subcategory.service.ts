@@ -15,6 +15,7 @@ import CustomResponse from 'src/common/providers/custom-response.service';
 import { throwException } from 'src/util/errorhandling';
 import { Category } from '../category.schema/category.schema'; // Corrected import path
 import { fileUpload } from 'src/util/fileupload';
+import CustomError from 'src/common/providers/customer-error.service';
 @Injectable()
 export class SubcategoryService {
   constructor(
@@ -162,7 +163,10 @@ export class SubcategoryService {
         subcategories,
       );
     } catch (error) {
-      throw new Error(`Error fetching subcategories: ${error.message}`);
+      throw new CustomError(
+        500,
+        `Error fetching subcategories: ${error.message}`,
+      );
     }
   }
 
@@ -194,7 +198,7 @@ export class SubcategoryService {
       });
       return new CustomResponse(
         HttpStatus.OK,
-        'Subcategory By Id  SuccessFully',
+        'Subcategory By Id SuccessFully',
         subcategories,
       );
     } catch (error) {
@@ -212,7 +216,7 @@ export class SubcategoryService {
       const subcategories = await this.subcategoryModel.findOne({ _id: id });
       return new CustomResponse(
         HttpStatus.OK,
-        'All Subcategories get With Category Id',
+        'All Subcategories get With subCategory Id',
         subcategories,
       );
     } catch (error) {
