@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Put,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
@@ -31,15 +23,21 @@ export class InventoryController {
   }
 
   @Put('editInventory/:id')
-  update(
-    @Param('id') id: string,
-    @Body() updateInventoryDto: UpdateInventoryDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateInventoryDto: UpdateInventoryDto) {
     return this.inventoryService.update(id, updateInventoryDto);
   }
 
   @Delete('deleteInventory/:id')
   delete(@Param('id') id: string) {
     return this.inventoryService.delete(id);
+  }
+
+  /**
+   * Generic Filter Endpoint
+   * Example: /inventory/filter?status=in_stock&minPrice=100&maxPrice=500
+   */
+  @Get('InventoryFilter')
+  filterInventory(@Query() query: any) {
+    return this.inventoryService.filterInventory(query);
   }
 }

@@ -71,7 +71,7 @@ export class AuthService {
         return new CustomResponse(HttpStatus.OK, MESSAGE.OTP.VERIFY, user);
       }
 
-      return new CustomResponse(HttpStatus.NOT_FOUND, 'OTP Expire Or Failed');
+       return new CustomResponse(401, 'OTP Expire Or Failed');
     } catch (error) {
       throwException('failed to verify otp');
     }
