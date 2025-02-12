@@ -18,13 +18,12 @@ export class TwilioService {
     }
 
     this.client = twilio(accountSid, authToken);
-    console.log('TWILIO_ACCOUNT_SID:', process.env.TWILIO_ACCOUNT_SID);
-    console.log('TWILIO_AUTH_TOKEN:', process.env.TWILIO_AUTH_TOKEN);
   }
 
   // Send OTP via Twilio SMS
   async sendOTP(phoneNumber: string, otp: string): Promise<void> {
-    const message = `Your OTP is ${otp}. Please use it to log in.`;
+    const message = `Your TSJ verification code is ${otp}. It will expire in 1 minutes. Do not share this code.  
+`;
     await this.client.messages.create({
       body: message,
       from: process.env.TWILIO_ACCOUNT_PHONE_NUMBER as string,

@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsPhoneNumber, IsOptional, IsIn } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsOptional,
+  IsIn,
+} from 'class-validator';
 
 export class UpdateRiderStatusDto {
   @IsString()
@@ -17,7 +23,6 @@ export class UpdateRiderStatusDto {
   @IsNotEmpty()
   dob: string;
 
-
   @IsPhoneNumber()
   @IsOptional()
   secondaryMoibleNumber: string;
@@ -30,17 +35,13 @@ export class UpdateRiderStatusDto {
   @IsNotEmpty()
   city: string;
 
-  @IsPhoneNumber()
-  @IsNotEmpty()
-  primaryMoibleNumber: string;
-
   @IsString()
   @IsNotEmpty()
   language: string;
 
   @IsPhoneNumber()
   @IsNotEmpty()
-  phone: string;
+  primaryMobileNumber: string;
 
   @IsString()
   @IsOptional()
@@ -53,6 +54,4 @@ export class UpdateRiderStatusDto {
   @IsString()
   @IsOptional()
   status: string;
-
 }
-

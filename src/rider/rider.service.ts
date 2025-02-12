@@ -22,29 +22,26 @@ export class RiderService {
     profileImage?: Express.Multer.File,
   ) {
     try {
-      let profilePicture: string | undefined;
-
-      if (profilePicture) {
-        const uploadedFileName = fileUpload('profile_pictures', profilePicture);
-        profilePicture = `${process.env.SERVER_BASE_URL}/uploads/profile_pictures/${uploadedFileName}`;
+      if (profileImage) {
+        const uploadedFileName = fileUpload('profile_pictures', profileImage);
+        createRiderDto.profilePicture = `${process.env.SERVER_BASE_URL}/uploads/profile_pictures/${uploadedFileName}`;
       }
 
       const newRider = new this.riderModel({
         ...createRiderDto,
-        profilePicture,
       });
 
       const existingRider = await this.riderModel.findOne({
         primaryMobileNumber: createRiderDto.primaryMobileNumber,
       });
       if (existingRider) {
-        throw new CustomResponse(403, 'Rider Already Exits !');
+        return new CustomResponse(403, 'Rider Already Exits !');
       }
       const rider = await newRider.save();
 
       return new CustomResponse(200, 'Rider Successfully Created', rider);
     } catch (error) {
-      throw new CustomError(500, 'Internal check Error');
+      throw new CustomError(500, 'Internal Server Error');
     }
   }
 

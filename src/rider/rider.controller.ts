@@ -1,39 +1,38 @@
 import {
   Controller,
   Post,
-  Put,
   Body,
-  Param,
-  Query,
-  Delete,
   Get,
-  UploadedFiles,
-  UploadedFile,
+  Param,
+  Put,
   UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { RiderService } from './rider.service';
-import {
-  FileInterceptor,
-  FileFieldsInterceptor,
-} from '@nestjs/platform-express';
 import { CreateRiderDto } from './dto/create-rider.dto';
-import { UploadDocumentsDto } from './dto/uploadDocuments.dto';
-import { ValidationPipe } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('riders')
 export class RiderController {
   constructor(private readonly riderService: RiderService) {}
 
+  // Create a new rider with profile picture
   @Post()
-  @UseInterceptors(FileInterceptor('profileImage'))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'profilePicture', maxCount: 1 }]),
+  )
   async createRider(
     @Body() createRiderDto: CreateRiderDto,
-    @UploadedFile() profileImage: Express.Multer.File,
+    @UploadedFiles() files: { profilePicture?: Express.Multer.File[] },
   ) {
-    return await this.riderService.createRider(createRiderDto, profileImage);
+    return this.riderService.createRider(
+      createRiderDto,
+      files?.profilePicture?.[0],
+    );
   }
 
-  @Post('documents')
+  // Upload rider documents
+  @Post('uploadDocuments')
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'aadharFront', maxCount: 1 },
@@ -44,8 +43,7 @@ export class RiderController {
     ]),
   )
   async uploadDocuments(
-    @Body(new ValidationPipe({ transform: true }))
-    uploadDocumentsDto: UploadDocumentsDto,
+    @Body() uploadDocumentsDto: any,
     @UploadedFiles()
     files: {
       aadharFront?: Express.Multer.File[];
@@ -55,12 +53,16 @@ export class RiderController {
       drivingLicenseBack?: Express.Multer.File[];
     },
   ) {
-    return await this.riderService.uploadDocuments(uploadDocumentsDto, files);
+    return this.riderService.uploadDocuments(uploadDocumentsDto, files);
   }
+
+  // Get all riders
   @Get('getAllRiders')
-  async findAll(@Query('status') status?: string) {
-    return this.riderService.findAll(status);
+  async getAllRiders() {
+    return this.riderService.findAll();
   }
+
+  // Get documents by rider ID
   @Get(':riderId/documents')
   async getDocuments(@Param('riderId') riderId: string) {
     return this.riderService.getDocuments(riderId);

@@ -9,7 +9,7 @@ export const RiderSchema = new Schema(
     whatsappNumber: { type: String },
     bloodGroup: { type: String, required: true },
     city: { type: String, required: true },
-    primaryMobileNumber: { type: String, required: true },
+    primaryMobileNumber: { type: String, unique: true, required: true },
     secondaryMobileNumber: { type: String },
     language: { type: String, required: true },
     referralCode: { type: String },

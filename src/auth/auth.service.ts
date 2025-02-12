@@ -29,7 +29,6 @@ export class AuthService {
     try {
       const otp = this.generateOTP();
       const userPhone = createUserDto.userPhone;
-      console.log('userphone', userPhone);
       const user = await this.userModel.findOne({ userPhone });
 
       if (!user || !user.userPhone || user.userPhone === '') {
@@ -45,7 +44,7 @@ export class AuthService {
           { userPhone },
           {
             otp,
-            otpExpiration: new Date(Date.now() + 2 * 60 * 1000), // OTP expiration set to 2 minutes
+            otpExpiration: new Date(Date.now() + 1 * 60 * 1000), // OTP expiration set to 1 minutes
           },
         );
         await this.twilioService.sendOTP(userPhone, otp);
@@ -71,7 +70,7 @@ export class AuthService {
         return new CustomResponse(HttpStatus.OK, MESSAGE.OTP.VERIFY, user);
       }
 
-       return new CustomResponse(401, 'OTP Expire Or Failed');
+      return new CustomResponse(401, 'OTP Expire Or Failed');
     } catch (error) {
       throwException('failed to verify otp');
     }
@@ -98,7 +97,7 @@ export class AuthService {
           { userPhone },
           {
             otp,
-            otpExpiration: new Date(Date.now() + 2 * 60 * 1000), // OTP expiration set to 2 minutes
+            otpExpiration: new Date(Date.now() + 1 * 60 * 1000), // OTP expiration set to 1 minutes
           },
         );
         await this.twilioService.sendOTP(userPhone, otp);
