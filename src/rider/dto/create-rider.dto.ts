@@ -1,67 +1,55 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsPhoneNumber,
-  IsDate,
-  IsOptional,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateRiderDto {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   firstName: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   lastName: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   fathersName: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   dob: string;
 
-  @IsPhoneNumber()
   @IsNotEmpty()
+  @IsString()
   whatsappNumber: string;
 
-  @IsPhoneNumber()
-  @IsOptional()
-  secondaryMoibleNumber: string;
-
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   bloodGroup: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   city: string;
 
-  @IsPhoneNumber()
   @IsNotEmpty()
-  primaryMoibleNumber: string;
-
   @IsString()
+  primaryMobileNumber: string;
+
+  @IsOptional()
+  @IsString()
+  secondaryMobileNumber: string;
+
   @IsNotEmpty()
+  @IsString()
   language: string;
 
-  @IsPhoneNumber()
+  @IsOptional()
+  @IsString()
+  profilePicture?: string;
+
+  @IsOptional()
+  @IsString()
+  referralCode: string;
+
   @IsNotEmpty()
-  phone: string;
-
   @IsString()
-  @IsOptional()
-  profilePicture: string;
-
-  @IsString()
-  @IsOptional()
-  refferalCode: string;
-
-  userType: string;
-
-  @IsString()
-  @IsOptional()
-  status: string;
+  completeAddress: string;
 }
