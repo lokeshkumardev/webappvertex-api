@@ -12,13 +12,14 @@ export class TwilioService {
     // console.log('Starting', process.env)
     const accountSid = process.env.TWILIO_ACCOUNT_SID as string; // Make sure this SID is correct
     const authToken = process.env.TWILIO_AUTH_TOKEN as string; // Make sure this Auth Token is correct
-    console.log('accountSid is: ', accountSid);
 
     if (!accountSid || !authToken) {
       throw new CustomError(500, 'Twilio SID or Auth Token is missing');
     }
 
     this.client = twilio(accountSid, authToken);
+    console.log('TWILIO_ACCOUNT_SID:', process.env.TWILIO_ACCOUNT_SID);
+    console.log('TWILIO_AUTH_TOKEN:', process.env.TWILIO_AUTH_TOKEN);
   }
 
   // Send OTP via Twilio SMS
