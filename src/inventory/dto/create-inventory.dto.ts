@@ -11,6 +11,7 @@ export class CreateInventoryDto {
   name: string;
 
   @IsOptional()
+  @IsNumber()
   @Min(0)
   quantity: number;
 

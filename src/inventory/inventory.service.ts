@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Inventory, InventoryDocument } from '../inventory/schema/inventory.schema';
+import {
+  Inventory,
+  InventoryDocument,
+} from '../inventory/schema/inventory.schema';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import { throwException } from 'src/util/errorhandling';
 import { CreateInventoryDto } from '../inventory/dto/create-inventory.dto';
 import { UpdateInventoryDto } from '../inventory/dto/update-inventory.dto';
 import { StockStatus } from '../inventory/dto/create-inventory.dto';
+import { stat } from 'fs';
 
 @Injectable()
 export class InventoryService {
@@ -25,8 +29,15 @@ export class InventoryService {
   async create(data: CreateInventoryDto) {
     try {
       const status = this.determineStockStatus(data.quantity);
-      const inventory = await new this.inventoryModel({ ...data, status }).save();
-      return new CustomResponse(201, 'Inventory Created Successfully', inventory);
+      const inventory = await new this.inventoryModel({
+        ...data,
+        status,
+      }).save();
+      return new CustomResponse(
+        201,
+        'Inventory Created Successfully',
+        inventory,
+      );
     } catch (error) {
       throwException(error);
     }
@@ -38,7 +49,11 @@ export class InventoryService {
       if (items.length === 0) {
         throw new CustomResponse(404, 'No inventory items found');
       }
-      return new CustomResponse(200, 'Inventory List Retrieved Successfully', items);
+      return new CustomResponse(
+        200,
+        'Inventory List Retrieved Successfully',
+        items,
+      );
     } catch (error) {
       throwException(error);
     }
@@ -48,7 +63,11 @@ export class InventoryService {
     try {
       const item = await this.inventoryModel.findById(id).exec();
       if (!item) throw new NotFoundException('Inventory item not found');
-      return new CustomResponse(200, 'Inventory Item Retrieved Successfully', item);
+      return new CustomResponse(
+        200,
+        'Inventory Item Retrieved Successfully',
+        item,
+      );
     } catch (error) {
       throwException(error);
     }
@@ -60,9 +79,16 @@ export class InventoryService {
         data.status = this.determineStockStatus(data.quantity);
       }
 
-      const updatedItem = await this.inventoryModel.findByIdAndUpdate(id, data, { new: true }).exec();
-      if (!updatedItem) throw new CustomResponse(404, 'Inventory item not found');
-      return new CustomResponse(200, 'Inventory Item Updated Successfully', updatedItem);
+      const updatedItem = await this.inventoryModel
+        .findByIdAndUpdate(id, data, { new: true })
+        .exec();
+      if (!updatedItem)
+        throw new CustomResponse(404, 'Inventory item not found');
+      return new CustomResponse(
+        200,
+        'Inventory Item Updated Successfully',
+        updatedItem,
+      );
     } catch (error) {
       throwException(error);
     }
@@ -70,9 +96,16 @@ export class InventoryService {
 
   async delete(id: string): Promise<any> {
     try {
-      const deletedItem = await this.inventoryModel.findByIdAndDelete(id).exec();
-      if (!deletedItem) throw new CustomResponse(404, 'Inventory item not found');
-      return new CustomResponse(200, 'Inventory Deleted Successfully', deletedItem);
+      const deletedItem = await this.inventoryModel
+        .findByIdAndDelete(id)
+        .exec();
+      if (!deletedItem)
+        throw new CustomResponse(404, 'Inventory item not found');
+      return new CustomResponse(
+        200,
+        'Inventory Deleted Successfully',
+        deletedItem,
+      );
     } catch (error) {
       throwException(error);
     }
@@ -97,10 +130,16 @@ export class InventoryService {
         filter.price = { ...filter.price, $lte: parseFloat(query.maxPrice) };
       }
       if (query.minQuantity) {
-        filter.quantity = { ...filter.quantity, $gte: parseInt(query.minQuantity) };
+        filter.quantity = {
+          ...filter.quantity,
+          $gte: parseInt(query.minQuantity),
+        };
       }
       if (query.maxQuantity) {
-        filter.quantity = { ...filter.quantity, $lte: parseInt(query.maxQuantity) };
+        filter.quantity = {
+          ...filter.quantity,
+          $lte: parseInt(query.maxQuantity),
+        };
       }
       if (query.name) {
         filter.name = { $regex: query.name, $options: 'i' }; // Case-insensitive search
@@ -108,10 +147,17 @@ export class InventoryService {
 
       const items = await this.inventoryModel.find(filter).exec();
       if (!items.length) {
-        throw new CustomResponse(404, 'No inventory items match the filter criteria');
+        throw new CustomResponse(
+          404,
+          'No inventory items match the filter criteria',
+        );
       }
 
-      return new CustomResponse(200, 'Filtered Inventory Retrieved Successfully', items);
+      return new CustomResponse(
+        200,
+        'Filtered Inventory Retrieved Successfully',
+        items,
+      );
     } catch (error) {
       throwException(error);
     }
