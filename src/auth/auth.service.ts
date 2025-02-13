@@ -8,7 +8,6 @@ import { User } from 'src/user/interface/user.interface';
 import { MESSAGE } from 'src/util/constants';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import { throwException } from 'src/util/errorhandling';
-import { AdminLoginDto } from './dto/admin-login.dto';
 import CustomError from 'src/common/providers/customer-error.service';
 
 @Injectable()

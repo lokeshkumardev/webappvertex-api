@@ -6,20 +6,11 @@ export type InventoryDocument = Inventory & Document;
 
 @Schema({ timestamps: true })
 export class Inventory {
-  @Prop({ required: true })
+  @Prop({ required: false })
   name: string;
 
-  @Prop({ required: true, min: 0 })
+  @Prop({ required: false, min: 0 })
   quantity: number;
-
-  @Prop()
-  description?: string;
-
-  @Prop({ required: true, min: 0 })
-  price: number;
-
-  @Prop({ required: true, enum: StockStatus })
-  status: StockStatus;
 }
 
 export const InventorySchema = SchemaFactory.createForClass(Inventory);

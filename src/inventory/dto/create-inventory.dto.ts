@@ -7,10 +7,10 @@ export enum StockStatus {
 }
 
 export class CreateInventoryDto {
-  @IsString()
+  @IsOptional()
   name: string;
 
-  @IsNumber()
+  @IsOptional()
   @Min(0)
   quantity: number;
 
@@ -19,9 +19,11 @@ export class CreateInventoryDto {
   description?: string;
 
   @IsNumber()
+  @IsOptional()
   @Min(0)
   price: number;
 
   @IsEnum(StockStatus)
+  @IsOptional()
   status: StockStatus;
 }

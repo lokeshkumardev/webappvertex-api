@@ -36,5 +36,4 @@ export class UpdateSubcategoryDto {
   @IsOptional()
   @IsString()
   metaDescription?: string;
-s
 }
