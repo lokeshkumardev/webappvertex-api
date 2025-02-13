@@ -123,12 +123,6 @@ export class InventoryService {
       if (query.status) {
         filter.status = query.status;
       }
-      if (query.minPrice) {
-        filter.price = { ...filter.price, $gte: parseFloat(query.minPrice) };
-      }
-      if (query.maxPrice) {
-        filter.price = { ...filter.price, $lte: parseFloat(query.maxPrice) };
-      }
       if (query.minQuantity) {
         filter.quantity = {
           ...filter.quantity,

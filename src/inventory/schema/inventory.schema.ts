@@ -15,9 +15,6 @@ export class Inventory {
   @Prop()
   description?: string;
 
-  @Prop({ required: true, min: 0 })
-  price: number;
-
   @Prop({ required: true, enum: StockStatus })
   status: StockStatus;
 }
