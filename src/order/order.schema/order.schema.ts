@@ -1,0 +1,35 @@
+import { Schema, Document } from 'mongoose';
+
+export const OrderSchema = new Schema({
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  serviceType: { type: String, enum: ['food', 'laundry'], required: true },
+  totalAmount: { type: Number, required: true },
+  finalAmount: { type: Number, required: true }, // Final amount after discount and offers
+  totalQuantity: { type: Number, default: 1 }, // Default to 1 if not provided
+  address: { type: String, required: true },
+  specialOffer: { type: Number, default: 0 }, // Percentage
+  discount: { type: Number, default: 0 }, // Percentage
+  subCategoryId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Subcategory',
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'in_progress', 'completed'],
+    default: 'pending',
+  },
+});
+
+export interface Order extends Document {
+  userId: string;
+  serviceType: string;
+  totalAmount: number;
+  finalAmount: number;
+  totalQuantity: number;
+  address: string;
+  specialOffer?: number;
+  discount?: number;
+  subCategoryId: string;
+  status: string;
+}
