@@ -6,6 +6,7 @@ import {
   Param,
   Put,
   Delete,
+  Query,
   UseInterceptors,
   UploadedFiles,
   UploadedFile,
@@ -38,7 +39,7 @@ export class PlanController {
     return this.planService.createPlan(planDto, files);
   }
 
-  @Get(':id')
+  @Get('getByPlanId/:id')
   getPlanById(@Param('id') id: string) {
     return this.planService.getPlanById(id);
   }
@@ -76,7 +77,12 @@ export class PlanController {
   ) {
     return this.planService.updatePlan(id, planDto, files);
   }
-
+  @Get('getFilteredPlan')
+  async getCategories(
+    @Query() filterParams: Record<string, any>, // Accept all query parameters as an object
+  ) {
+    return this.planService.getFilteredPlan(filterParams);
+  }
   @Delete(':id')
   deletePlan(@Param('id') id: string) {
     return this.planService.deletePlan(id);
