@@ -1,7 +1,16 @@
-// import { IsNotEmpty } from "class-validator";
+import { IsMongoId, IsNotEmpty, IsNumber } from 'class-validator';
 
-// export class subscriptionDto{
+export class SubscriptionDto {
+  @IsNotEmpty()
+  name: string;
 
-//     @IsNotEmpty()
+  @IsNotEmpty()
+  @IsNumber()
+  price: number;
 
-// }
+  @IsNotEmpty()
+  planId: string;
+
+  @IsNotEmpty()
+  userId: string;
+}

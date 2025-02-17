@@ -18,6 +18,7 @@ import * as dotenv from 'dotenv';
 import { SubcategoryModule } from './category/subcategory/subcategory.module';
 import { APP_FILTER } from '@nestjs/core';
 import { PlanModule } from './plan/plan.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 dotenv.config({ path: './.env' });
 @Module({
   imports: [
@@ -39,6 +40,7 @@ dotenv.config({ path: './.env' });
     MenuModule,
     BannerModule,
     InventoryModule,
+    SubscriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
