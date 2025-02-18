@@ -44,15 +44,15 @@ export class PlanController {
     return this.planService.getPlanById(id);
   }
 
-  @Get('subcategory/:subCategoryId')
-  getPlansBySubCategory(@Param('subCategoryId') subCategoryId: string) {
-    return this.planService.getPlansBySubCategory(subCategoryId);
-  }
+  // @Get('subcategory/:subCategoryId')
+  // getPlansBySubCategory(@Param('subCategoryId') subCategoryId: string) {
+  //   return this.planService.getPlansBySubCategory(subCategoryId);
+  // }
 
-  @Get('usertype/:userType')
-  getPlansByUserType(@Param('userType') userType: string) {
-    return this.planService.getPlansByUserType(userType);
-  }
+  // @Get('usertype/:userType')
+  // getPlansByUserType(@Param('userType') userType: string) {
+  //   return this.planService.getPlansByUserType(userType);
+  // }
 
   // @Put(':id')
   // updatePlan(@Param('id') id: string, @Body() planDto: Partial<PlanDto>) {

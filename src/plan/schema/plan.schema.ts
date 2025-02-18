@@ -16,7 +16,7 @@ export class Plan extends Document {
   @Prop({ required: true })
   price: number;
 
-  @Prop({ required: true, enum: ['Breakfast', 'Lunch', 'Dinner'] })
+  @Prop({ required: true, enum: ['Breakfast', 'Lunch', 'Dinner', 'Laundry'] })
   plan: string;
 
   @Prop({ reuired: true, default: 'permanent' })
