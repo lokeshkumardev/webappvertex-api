@@ -21,6 +21,7 @@ import { PlanModule } from './plan/plan.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { WalletModule } from './wallet/wallet.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { RazorpayService } from './razorpay/razorpay.service';
 dotenv.config({ path: './.env' });
 @Module({
   imports: [
@@ -47,6 +48,6 @@ dotenv.config({ path: './.env' });
     TransactionModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, RazorpayService],
 })
 export class AppModule {}

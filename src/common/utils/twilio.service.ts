@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as twilio from 'twilio';
+import twilio from 'twilio';
 import * as dotenv from 'dotenv';
 import CustomError from '../providers/customer-error.service';
 dotenv.config({ path: './.env' });
@@ -18,9 +18,10 @@ export class TwilioService {
     }
 
     this.client = twilio(accountSid, authToken);
+    console.log(this.client);
   }
 
-  // Send OTP via Twilio SMS
+  // Send OTP via Twilio SM
   async sendOTP(phoneNumber: string, otp: string): Promise<void> {
     const message = `Your TSJ verification code is ${otp}. It will expire in 1 minutes. Do not share this code.  
 `;

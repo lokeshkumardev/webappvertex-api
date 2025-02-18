@@ -60,7 +60,7 @@ export class PlanService {
       return new CustomResponse(HttpStatus.OK, 'Plans retrieved successfully', plans);
     } catch (error) {
       throwException(error);
-    }
+    } 
   }
 
   async getFilteredPlan(filters: Record<string, any>) {
