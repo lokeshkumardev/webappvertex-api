@@ -6,12 +6,16 @@ import { SubscriptionDto } from './dto/subscription.dto'; // Assuming you have a
 import CustomError from 'src/common/providers/customer-error.service';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import { throwException } from 'src/util/errorhandling';
+import { Wallet } from 'src/wallet/schema/wallet.schema';
 
 @Injectable()
 export class SubscriptionService {
   constructor(
     @InjectModel(Subscription.name)
     private readonly subscriptionModel: Model<Subscription>,
+
+    @InjectModel(Wallet.name) // Inject Wallet Model
+    private readonly walletModel: Model<Wallet>,
   ) {}
 
   // Method to create and save a new subscription
@@ -39,7 +43,7 @@ export class SubscriptionService {
         saveData,
       );
     } catch (error) {
-      throw throwException('Failed to create subscription');
+      throw throwException(error);
     }
   }
 
@@ -55,4 +59,43 @@ export class SubscriptionService {
       fetchData,
     );
   }
+  async skipMeal(userId: string, date: string) {
+    try {
+      const subscription = await this.subscriptionModel.findOne({
+        userId: new Types.ObjectId(userId),
+        endDate: { $gte: new Date(date) }, // Check active subscription
+      });
+
+      if (!subscription) throw new CustomResponse(400,'Subscription not found');
+
+      const selectedDate = new Date(date);
+
+      // Check if meal is already skipped
+      if (subscription.skippedDays.some((d) => d.toDateString() === selectedDate.toDateString())) {
+        throw new BadRequestException('Meal already skipped for this day');
+      }
+
+      // Calculate Per Day Amount
+      const perDayCost = subscription.totalAmount / subscription.planDays;
+
+      // Add date to skippedDays array
+      subscription.skippedDays.push(selectedDate);
+      await subscription.save();
+
+      // Update Wallet
+      let wallet = await this.walletModel.findOne({ userId: new Types.ObjectId(userId) });
+
+      if (!wallet) {
+        wallet = new this.walletModel({ userId: new Types.ObjectId(userId), balance: perDayCost });
+      } else {
+        wallet.balance += perDayCost;
+      }
+
+      await wallet.save();
+      return new CustomResponse(200, 'Meal skipped and amount credited', { balance: wallet.balance });
+    } catch (error) {
+      throw throwException(error);
+    }
+  }
+  
 }

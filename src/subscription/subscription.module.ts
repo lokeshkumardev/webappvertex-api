@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { SubscriptionController } from './subscription.controller';
 import { SubscriptionService } from './subscription.service';
 import { Subscription, SubscriptionSchema } from './schema/subscription.schema';
+import { WalletModule } from 'src/wallet/wallet.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { Subscription, SubscriptionSchema } from './schema/subscription.schema';
     MongooseModule.forFeature([
       { name: Subscription.name, schema: SubscriptionSchema },
     ]),
+    WalletModule
   ],
   controllers: [SubscriptionController], // Register the controller to handle the routes
   providers: [SubscriptionService], // Register the service to handle the business logic

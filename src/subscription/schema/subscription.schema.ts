@@ -14,6 +14,25 @@ export class Subscription extends Document {
 
   @Prop({ type: Number, required: true })
   price: number;
+
+  @Prop({ required: true, enum: [15, 30] })
+  planDays: number;
+
+  @Prop({ required: true })
+  totalAmount: number; // Total price of plan
+
+  @Prop({ required: true })
+  startDate: Date;
+
+  @Prop({ required: true })
+  endDate: Date;
+
+  @Prop({ type: [Date], default: [] })
+  skippedDays: Date[];
+
+  @Prop({ type: [String], enum: ['breakfast', 'lunch', 'dinner'], default: [] }) 
+  services: string[];
+
 }
 
 export const SubscriptionSchema = SchemaFactory.createForClass(Subscription);

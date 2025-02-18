@@ -12,6 +12,6 @@ import { TransactionModule } from '../transaction/transaction.module';
   ],
   providers: [WalletService],
   controllers: [WalletController],
-  exports: [WalletService],
+  exports: [WalletService,MongooseModule],
 })
 export class WalletModule {}

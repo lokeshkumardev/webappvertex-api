@@ -30,4 +30,8 @@ export class SubscriptionController {
       planObjectId,
     );
   }
+  @Post('skip')
+  async skipMeal(@Body() body: { userId: string; date: string }) {
+    return this.subscriptionService.skipMeal(body.userId, body.date);
+  }
 }
