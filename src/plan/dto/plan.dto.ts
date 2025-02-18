@@ -23,6 +23,8 @@ export class PlanDto {
   // @IsNumber()
   price: number;
 
+  offerPrice: number;
+
   @IsNotEmpty()
   @IsString()
   plan: string; // Breakfast, Lunch, Dinner
