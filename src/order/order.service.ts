@@ -19,8 +19,8 @@ export class OrderService {
     @InjectModel('Subcategory') private readonly subcategoryModel: Model<Subcategory>,
   ) {
     this.razorpayInstance = new Razorpay({
-      key_id:'rzp_test_uD2mC1DrL9W815',
-      key_secret:'HuaUElwQoNrGRDmbDTqQCiXB',
+      key_id:process.env.RAZORPAY_KEY_ID,
+      key_secret:process.env.RAZORPAY_KEY_SECRET,
     });
   }
 
