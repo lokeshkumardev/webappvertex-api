@@ -9,12 +9,15 @@ import { MESSAGE } from 'src/util/constants';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import { throwException } from 'src/util/errorhandling';
 import CustomError from 'src/common/providers/customer-error.service';
+import { RiderService } from 'src/rider/rider.service';
+import { Rider } from 'src/rider/rider.schema/rider.schema';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel('User') private readonly userModel: Model<User>, // Mongoose model for User
     private readonly twilioService: TwilioService, // Twilio service to send OTP
+    @InjectModel('Rider') private readonly riderModel: Model<Rider>,
   ) {}
 
   // Generate OTP
@@ -66,6 +69,9 @@ export class AuthService {
         createUserDto.otp === user.otp &&
         new Date() < user.otpExpiration
       ) {
+        return new CustomResponse(HttpStatus.OK, MESSAGE.OTP.VERIFY, user);
+      } else if (createUserDto.userType === 'rider') {
+        const user = await this.riderModel.findOne({ userPhone });
         return new CustomResponse(HttpStatus.OK, MESSAGE.OTP.VERIFY, user);
       }
 

@@ -27,6 +27,8 @@ export class Plan extends Document {
 
   // @Prop({ type: Types.ObjectId, ref: 'SubCategory', required: true })
   // subCategoryId: Types.ObjectId;
+  @Prop({ required: true })
+  OfferPrice: number;
 
   @Prop()
   webImage: string;

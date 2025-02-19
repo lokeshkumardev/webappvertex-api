@@ -45,6 +45,8 @@ export class CreateRiderDto {
   @IsString()
   profilePicture?: string;
 
+  userType: 'rider';
+
   @IsOptional()
   @IsString()
   referralCode: string;

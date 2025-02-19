@@ -35,6 +35,8 @@ export class PlanDto {
   @IsString()
   planType: string; // "Golden" or "Silver"
 
+  OfferPrice: number;
+
   // @IsOptional()
   // @IsString()
   webImage?: string;

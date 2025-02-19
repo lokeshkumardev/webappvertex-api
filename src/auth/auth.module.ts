@@ -6,6 +6,7 @@ import { UserSchema } from 'src/user/user.schema/user.schema';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { RiderModule } from 'src/rider/rider.module';
 // auth.module.ts
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthService } from './auth.service';
     }),
     forwardRef(() => UserModule), // Handle circular dependency
     TwilioModule,
+    RiderModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

@@ -15,5 +15,6 @@ import { documentSchema } from './rider.schema/document.schema';
   ],
   controllers: [RiderController],
   providers: [RiderService],
+  exports: [RiderService, MongooseModule],
 })
 export class RiderModule {}

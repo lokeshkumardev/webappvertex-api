@@ -13,7 +13,6 @@ export class RazorpayService {
     });
   }
 
-
   async createOrder(amount: number, currency: string = 'INR') {
     const options = {
       amount: amount * 100, // Amount in paisa

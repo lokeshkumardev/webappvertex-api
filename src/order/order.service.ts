@@ -2,13 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 const Razorpay = require('razorpay');
- // This is the recommended way if esModuleInterop is enabled
+// This is the recommended way if esModuleInterop is enabled
 import { createHmac } from 'crypto';
 import { Order } from './order.schema/order.schema';
 import { CreateOrderDto } from './dto/create-order-dto';
 import { Subcategory } from 'src/category/category.schema/sub-category.schema';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import CustomError from 'src/common/providers/customer-error.service';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: './.env' });
 
 @Injectable()
 export class OrderService {
@@ -16,11 +19,12 @@ export class OrderService {
 
   constructor(
     @InjectModel('Order') private readonly orderModel: Model<Order>,
-    @InjectModel('Subcategory') private readonly subcategoryModel: Model<Subcategory>,
+    @InjectModel('Subcategory')
+    private readonly subcategoryModel: Model<Subcategory>,
   ) {
     this.razorpayInstance = new Razorpay({
-      key_id:process.env.RAZORPAY_KEY_ID,
-      key_secret:process.env.RAZORPAY_KEY_SECRET,
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
     });
   }
 
@@ -28,7 +32,15 @@ export class OrderService {
    * ✅ Create a new order
    */
   async createOrder(createOrderDto: CreateOrderDto) {
-    const { userId, serviceType, address, subCategoryId, specialOffer = 0, discount = 0, totalQuantity = 1 } = createOrderDto;
+    const {
+      userId,
+      serviceType,
+      address,
+      subCategoryId,
+      specialOffer = 0,
+      discount = 0,
+      totalQuantity = 1,
+    } = createOrderDto;
 
     const subcategory = await this.subcategoryModel.findById(subCategoryId);
     if (!subcategory) throw new CustomResponse(404, 'Subcategory not found');
@@ -41,7 +53,16 @@ export class OrderService {
     const finalAmount = totalAmount - discountAmount - specialOfferAmount;
 
     const newOrder = new this.orderModel({
-      userId, serviceType, address, totalAmount, finalAmount, totalQuantity, specialOffer, discount, subCategoryId, status: 'pending',
+      userId,
+      serviceType,
+      address,
+      totalAmount,
+      finalAmount,
+      totalQuantity,
+      specialOffer,
+      discount,
+      subCategoryId,
+      status: 'pending',
     });
 
     const savedOrder = await newOrder.save();
@@ -52,7 +73,10 @@ export class OrderService {
    * ✅ Get all orders
    */
   async getAllOrders() {
-    const orders = await this.orderModel.find().populate('userId subCategoryId').exec();
+    const orders = await this.orderModel
+      .find()
+      .populate('userId subCategoryId')
+      .exec();
     return new CustomResponse(200, 'All Orders Retrieved Successfully', orders);
   }
 
@@ -69,53 +93,56 @@ export class OrderService {
    * ✅ Create Razorpay Payment Order
    */
   /**
- * ✅ Create Razorpay Payment Order
- */
-async createPayment(orderId: string) {
-  const order = await this.orderModel.findById(orderId);
-  if (!order) throw new CustomError(404, 'Order not found');
-  
-  // Create Razorpay payment order
-  const razorpayOrder = await this.razorpayInstance.orders.create({
-    amount: 100,
-    currency: 'INR',
-    receipt: "ord2828389",
-    payment_capture: true,
-  });
+   * ✅ Create Razorpay Payment Order
+   */
+  async createPayment(orderId: string) {
+    const order = await this.orderModel.findById(orderId);
+    if (!order) throw new CustomError(404, 'Order not found');
 
-  // Save the Razorpay order ID in the database
-  order.razorpayOrderId = razorpayOrder.id;
-  await order.save();
+    // Create Razorpay payment order
+    const razorpayOrder = await this.razorpayInstance.orders.create({
+      amount: 100,
+      currency: 'INR',
+      receipt: 'ord2828389',
+      payment_capture: true,
+    });
 
-  // Razorpay payment link
-  const paymentLink = `https://checkout.razorpay.com/v1/checkout.js?order_id=${razorpayOrder.id}`;
+    // Save the Razorpay order ID in the database
+    order.razorpayOrderId = razorpayOrder.id;
+    await order.save();
 
-  return new CustomResponse(200, 'Payment Order Created', {
-    razorpayOrder,
-    paymentLink, // Provide the payment link to the user
-  });
-}
+    // Razorpay payment link
+    const paymentLink = `https://checkout.razorpay.com/v1/checkout.js?order_id=${razorpayOrder.id}`;
 
-
+    return new CustomResponse(200, 'Payment Order Created', {
+      razorpayOrder,
+      paymentLink, // Provide the payment link to the user
+    });
+  }
 
   /**
    * ✅ Verify Razorpay Payment
    */
   async verifyPayment(body: any) {
     const { event, payload } = body;
-    console.log(body)
-    if (event !== 'payment.captured') return new CustomResponse(400, 'Invalid event type');
+    console.log(body);
+    if (event !== 'payment.captured')
+      return new CustomResponse(400, 'Invalid event type');
 
-    const { order_id, id: paymentId, signature } =   payload.payment.entity;
+    const { order_id, id: paymentId, signature } = payload.payment.entity;
 
     const order = await this.orderModel.findOne({ razorpayOrderId: order_id });
     if (!order) throw new CustomError(404, 'Order not found');
 
-    const expectedSignature = createHmac('sha256', 'HuaUElwQoNrGRDmbDTqQCiXB')
+    const expectedSignature = createHmac(
+      'sha256',
+      process.env.RAZORPAY_KEY_SECRET as string,
+    )
       .update(order_id + '|' + paymentId)
       .digest('hex');
 
-    if (signature !== expectedSignature) throw new CustomError(400, 'Invalid payment signature');
+    if (signature !== expectedSignature)
+      throw new CustomError(400, 'Invalid payment signature');
 
     order.razorpayPaymentId = paymentId;
     order.razorpaySignature = signature;
@@ -131,9 +158,16 @@ async createPayment(orderId: string) {
    */
   async refundPayment(orderId: string) {
     const order = await this.orderModel.findById(orderId);
-    if (!order || order.paymentStatus !== 'paid') throw new CustomError(404, 'Payment not found or not eligible for refund');
+    if (!order || order.paymentStatus !== 'paid')
+      throw new CustomError(
+        404,
+        'Payment not found or not eligible for refund',
+      );
 
-    const refund = await this.razorpayInstance.payments.refund(order.razorpayPaymentId as string, {});
+    const refund = await this.razorpayInstance.payments.refund(
+      order.razorpayPaymentId as string,
+      {},
+    );
     order.paymentStatus = 'refunded';
     await order.save();
 
