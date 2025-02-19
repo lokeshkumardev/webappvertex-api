@@ -56,11 +56,18 @@ export class RiderService {
     },
   ) {
     try {
+      // Check if Rider exists
       const rider = await this.riderModel.findById(uploadDocumentsDto.riderId);
       if (!rider) {
         throw new CustomError(500, 'Invalid Rider ID');
       }
 
+      // Find existing documents for the rider
+      let existingDocument = await this.documentModel.findOne({
+        riderId: uploadDocumentsDto.riderId,
+      });
+
+      // Process file uploads
       if (files?.aadharFront?.[0]) {
         const fileName = fileUpload('documents/aadhar', files.aadharFront[0]);
         uploadDocumentsDto.aadharFront = `${process.env.SERVER_BASE_URL}/uploads/documents/aadhar/${fileName}`;
@@ -92,8 +99,19 @@ export class RiderService {
         uploadDocumentsDto.drivingLicenseBack = `${process.env.SERVER_BASE_URL}/uploads/documents/dl/${fileName}`;
       }
 
-      const documentData = new this.documentModel(uploadDocumentsDto);
-      const savedDocument = await documentData.save();
+      let savedDocument;
+      if (existingDocument) {
+        // Update existing document
+        savedDocument = await this.documentModel.findOneAndUpdate(
+          { riderId: uploadDocumentsDto.riderId },
+          { $set: uploadDocumentsDto },
+          { new: true }, // Return updated document
+        );
+      } else {
+        // Create new document entry
+        const documentData = new this.documentModel(uploadDocumentsDto);
+        savedDocument = await documentData.save();
+      }
 
       return new CustomResponse(
         200,
