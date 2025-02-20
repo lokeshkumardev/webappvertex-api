@@ -1,5 +1,3 @@
-
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -10,6 +8,12 @@ export class Wallet extends Document {
 
   @Prop({ default: 0 })
   balance: number;
+
+  @Prop({ required: true })
+  title: string;
+
+  @Prop({ default: () => new Date() })
+  time: Date;
 }
 
 export const WalletSchema = SchemaFactory.createForClass(Wallet);
