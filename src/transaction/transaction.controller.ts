@@ -10,7 +10,7 @@ export class TransactionController {
     return this.transactionService.createTransaction(createTransactionDto);
   }
 
-  @Get('getTrans/:userId/history')
+  @Get('getTrans/history/:userId')
   async getTransactionHistory(@Param('userId') userId: string) {
     return this.transactionService.getTransactionHistory(userId);
   }
