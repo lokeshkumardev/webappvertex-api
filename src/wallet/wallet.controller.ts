@@ -11,12 +11,9 @@ export class WalletController {
     return this.walletService.getBalance(userId);
   }
 
-  @Post('addWalletMoney/add/:userId')
-  async addMoney(
-    @Param('userId') userId: string,
-    @Body() addMoneyDto: AddMoneyDto,
-  ) {
-    return this.walletService.addMoney(userId, addMoneyDto);
+  @Post('addWalletMoney/add')
+  async addMoney(@Body() addMoneyDto: AddMoneyDto) {
+    return this.walletService.addMoney(addMoneyDto);
   }
 
   @Post('deductWalletMoney/deduct/:userId')

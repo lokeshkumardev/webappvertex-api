@@ -13,6 +13,7 @@ import CustomError from 'src/common/providers/customer-error.service';
 export class StoreService {
   constructor(
     @InjectModel(Store.name) private storeModel: Model<StoreDocument>,
+    @InjectModel('Order') private orderModel: Model<any>,
   ) {}
 
   async createStoreOrder(storeDto: StoreDto, files: any) {
@@ -85,14 +86,11 @@ export class StoreService {
     }
   }
 
-  async getStoreOrders(storeId: string): Promise<Store[]> {
+  async getStoreOrders(storeId: string) {
     return await this.storeModel.find({ storeId }).exec();
   }
 
-  async updateOrderStatus(
-    orderId: string,
-    status: OrderStatus,
-  ): Promise<Store> {
+  async updateOrderStatus(orderId: string, status: OrderStatus) {
     const updatedOrder = await this.storeModel.findByIdAndUpdate(
       orderId,
       { status },
@@ -100,7 +98,7 @@ export class StoreService {
     );
 
     if (!updatedOrder) {
-      throw new NotFoundException('Order not found');
+      return new CustomError(404, 'Order not found');
     }
     return updatedOrder;
   }
@@ -108,7 +106,7 @@ export class StoreService {
   async deleteStoreOrders(id: string) {
     const store = await this.storeModel.findById(id).exec();
     if (!store) {
-      throw new CustomError(404, 'Store not found');
+      return new CustomResponse(404, 'Store not found');
     }
 
     const deleteStoreOrders = await this.storeModel
@@ -119,5 +117,23 @@ export class StoreService {
       'Store orders deleted successfully',
       deleteStoreOrders,
     );
+  }
+
+  async getUserHistory(userId: string) {
+    try {
+      const history = await this.orderModel.find({ userId }).exec();
+
+      if (!history.length) {
+        return new CustomResponse(404, 'No history found for this user');
+      }
+
+      return new CustomResponse(
+        200,
+        'User history fetched successfully',
+        history,
+      );
+    } catch (error) {
+      throwException(error);
+    }
   }
 }

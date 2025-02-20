@@ -52,6 +52,10 @@ export class StoreController {
   async getStoreOrders(@Param('storeId') storeId: string) {
     return this.storeService.getStoreOrders(storeId);
   }
+  @Get('history/:userId')
+  async getUserHistory(@Param('userId') userId: string) {
+    return this.storeService.getUserHistory(userId);
+  }
 
   @Delete(':id')
   async deleteStoreOrders(@Param('id') id: string) {

@@ -12,10 +12,10 @@ import { RazorpayModule } from 'src/razorpay/razorpay.module';
   imports: [
     MongooseModule.forFeature([{ name: 'Order', schema: OrderSchema }]),
     SubcategoryModule, // Add the SubcategoryModule here'
-    RazorpayModule
-    , // Add the RazorpayService here
+    RazorpayModule, // Add the RazorpayService here
   ],
   providers: [OrderService],
   controllers: [OrderController],
+  exports: [OrderService, MongooseModule],
 })
 export class OrderModule {}
