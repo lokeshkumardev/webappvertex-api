@@ -85,14 +85,11 @@ export class StoreService {
     }
   }
 
-  async getStoreOrders(storeId: string): Promise<Store[]> {
+  async getStoreOrders(storeId: string) {
     return await this.storeModel.find({ storeId }).exec();
   }
 
-  async updateOrderStatus(
-    orderId: string,
-    status: OrderStatus,
-  ): Promise<Store> {
+  async updateOrderStatus(orderId: string, status: OrderStatus) {
     const updatedOrder = await this.storeModel.findByIdAndUpdate(
       orderId,
       { status },
@@ -100,7 +97,7 @@ export class StoreService {
     );
 
     if (!updatedOrder) {
-      throw new NotFoundException('Order not found');
+      return new CustomError(404, 'Order not found');
     }
     return updatedOrder;
   }
@@ -108,7 +105,7 @@ export class StoreService {
   async deleteStoreOrders(id: string) {
     const store = await this.storeModel.findById(id).exec();
     if (!store) {
-      throw new CustomError(404, 'Store not found');
+      return new CustomResponse(404, 'Store not found');
     }
 
     const deleteStoreOrders = await this.storeModel
