@@ -9,6 +9,7 @@ import { CreateOrderDto } from './dto/create-order-dto';
 import { Subcategory } from 'src/category/category.schema/sub-category.schema';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import CustomError from 'src/common/providers/customer-error.service';
+import { User } from 'src/user/interface/user.interface';
 import * as dotenv from 'dotenv';
 
 dotenv.config({ path: './.env' });
@@ -19,6 +20,7 @@ export class OrderService {
 
   constructor(
     @InjectModel('Order') private readonly orderModel: Model<Order>,
+     @InjectModel('User') private readonly userModel: Model<User>,
     @InjectModel('Subcategory')
     private readonly subcategoryModel: Model<Subcategory>,
   ) {
@@ -27,6 +29,7 @@ export class OrderService {
       key_secret: process.env.RAZORPAY_KEY_SECRET,
     });
   }
+
 
   /**
    * ✅ Create a new order
@@ -194,4 +197,19 @@ export class OrderService {
     await order.save();
     return order;
   }
+
+  async getOrderHistoryByUrserId(userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new CustomError(404, 'User Not Found');
+  
+    const orders = await this.orderModel
+      .find({ userId }) // Sirf us user ke orders find karna
+      .populate('subCategoryId', 'name description') // Category ka name aur description include karega
+      .lean();
+  
+    if (!orders.length) throw new CustomError(404, 'No Orders Found for this User');
+  
+    return new CustomResponse(200,'Order History Fetch SuccessFully ',orders);
+  }
+  
 }

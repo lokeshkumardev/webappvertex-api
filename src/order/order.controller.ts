@@ -25,6 +25,11 @@ export class OrderController {
     return this.orderService.createPayment(orderId);
   }
 
+  @Get('getOrderHistoryByUrserId/:userId')
+    async getOrderHistoryByUrserId(@Param('userId') userId: string) {
+    return this.orderService.getOrderHistoryByUrserId(userId);
+  }
+
   @Post('webhook')
   async handleWebhook(@Body() body: any) {
     return this.orderService.verifyPayment(body);
