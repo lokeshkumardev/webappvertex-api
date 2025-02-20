@@ -1,0 +1,123 @@
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Store, StoreDocument } from './schema/store.schema';
+import { StoreDto, OrderStatus } from './dto/store.dto';
+import CustomResponse from 'src/common/providers/custom-response.service';
+import { fileUpload } from 'src/util/fileupload';
+import { throwException } from 'src/util/errorhandling';
+import { Types } from 'mongoose';
+import CustomError from 'src/common/providers/customer-error.service';
+
+@Injectable()
+export class StoreService {
+  constructor(
+    @InjectModel(Store.name) private storeModel: Model<StoreDocument>,
+  ) {}
+
+  async createStoreOrder(storeDto: StoreDto, files: any) {
+    try {
+      if (!storeDto || Object.keys(storeDto).length === 0) {
+        return new CustomResponse(
+          HttpStatus.CONFLICT,
+          'Missing required fields',
+        );
+      }
+
+      if (!files || Object.keys(files).length === 0) {
+        return new CustomResponse(
+          HttpStatus.CONFLICT,
+          'Missing required files',
+        );
+      }
+
+      const webImage = files?.web_image?.[0]
+        ? fileUpload('store/webImage', files.web_image[0])
+        : null;
+
+      //   console.log('webImage is: ', webImage);
+
+      const appImage = files?.app_image?.[0]
+        ? fileUpload('store/appImage', files.app_image[0])
+        : null;
+
+      //   console.log('appImage is: ', appImage);
+      storeDto['webImage'] =
+        `${process.env.SERVER_BASE_URL}/uploads/store/webImage/${webImage}`;
+
+      storeDto['appImage'] =
+        `${process.env.SERVER_BASE_URL}/uploads/store/appImage/${appImage}`;
+
+      const newOrder = new this.storeModel(storeDto);
+      const saveNewOrder = await newOrder.save();
+      return new CustomResponse(
+        HttpStatus.OK,
+        'Store Order Saved Successfully',
+        saveNewOrder,
+      );
+    } catch (error) {
+      console.error('Error in createStoreOrder:', error);
+      throwException(error);
+    }
+  }
+
+  async getFilteredStores(filters: Record<string, any>) {
+    try {
+      const query: any = {};
+
+      if (filters.serviceType) {
+        query.serviceType = filters.serviceType; // Exact match
+      }
+
+      const stores = await this.storeModel.find(query).exec();
+
+      if (!stores.length) {
+        return new CustomResponse(HttpStatus.NOT_FOUND, 'No Stores Found');
+      }
+
+      return new CustomResponse(
+        HttpStatus.OK,
+        'Stores retrieved successfully',
+        stores,
+      );
+    } catch (error) {
+      throwException(error);
+    }
+  }
+
+  async getStoreOrders(storeId: string): Promise<Store[]> {
+    return await this.storeModel.find({ storeId }).exec();
+  }
+
+  async updateOrderStatus(
+    orderId: string,
+    status: OrderStatus,
+  ): Promise<Store> {
+    const updatedOrder = await this.storeModel.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true },
+    );
+
+    if (!updatedOrder) {
+      throw new NotFoundException('Order not found');
+    }
+    return updatedOrder;
+  }
+
+  async deleteStoreOrders(id: string) {
+    const store = await this.storeModel.findById(id).exec();
+    if (!store) {
+      throw new CustomError(404, 'Store not found');
+    }
+
+    const deleteStoreOrders = await this.storeModel
+      .findByIdAndDelete(id)
+      .exec();
+    return new CustomResponse(
+      200,
+      'Store orders deleted successfully',
+      deleteStoreOrders,
+    );
+  }
+}
