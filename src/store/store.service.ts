@@ -13,6 +13,7 @@ import CustomError from 'src/common/providers/customer-error.service';
 export class StoreService {
   constructor(
     @InjectModel(Store.name) private storeModel: Model<StoreDocument>,
+    @InjectModel('Order') private orderModel: Model<any>,
   ) {}
 
   async createStoreOrder(storeDto: StoreDto, files: any) {
@@ -116,5 +117,23 @@ export class StoreService {
       'Store orders deleted successfully',
       deleteStoreOrders,
     );
+  }
+
+  async getUserHistory(userId: string) {
+    try {
+      const history = await this.orderModel.find({ userId }).exec();
+
+      if (!history.length) {
+        return new CustomResponse(404, 'No history found for this user');
+      }
+
+      return new CustomResponse(
+        200,
+        'User history fetched successfully',
+        history,
+      );
+    } catch (error) {
+      throwException(error);
+    }
   }
 }

@@ -16,6 +16,9 @@ export enum serviceType {
 
 @Schema({ timestamps: true })
 export class Store {
+  @Prop({ required: true, type: String })
+  userId: string;
+
   @Prop({ required: true })
   userName: string;
 

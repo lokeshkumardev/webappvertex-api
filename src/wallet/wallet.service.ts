@@ -32,9 +32,11 @@ export class WalletService {
     }
   }
 
-  async addMoney(userId: string, addMoneyDto: AddMoneyDto) {
+  async addMoney(addMoneyDto: AddMoneyDto) {
     try {
+      const userId = addMoneyDto.userId;
       let wallet = await this.walletModel.findOne({ userId });
+
       if (!wallet) {
         wallet = new this.walletModel({ userId, balance: 0 });
       }

@@ -9,7 +9,7 @@ export class Wallet extends Document {
   @Prop({ default: 0 })
   balance: number;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   title: string;
 
   @Prop({ default: () => new Date() })
