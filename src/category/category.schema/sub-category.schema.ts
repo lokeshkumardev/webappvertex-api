@@ -31,7 +31,7 @@ export class Subcategory {
   offer: string;
 
   @Prop({ required: true })
-  categoryId: string;  // Make sure this is the correct reference field type
+  categoryId: string; // Make sure this is the correct reference field type
 
   @Prop({ required: true, enum: ['daily', 'permanent'] })
   userType: 'daily' | 'permanent';
@@ -41,9 +41,20 @@ export class Subcategory {
 
   @Prop()
   meta_description: string;
-  
+
   @Prop()
-  is_published?: boolean; 
+  is_published?: boolean;
+
+  @Prop({
+    type: [
+      {
+        roti: String,
+        price: String,
+      },
+    ],
+    default: [],
+  })
+  ExtraMeal?: { roti: string; price: string }[];
 }
 
 // Export the Mongoose schema

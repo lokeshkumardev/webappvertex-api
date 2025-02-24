@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type StoreDocument = Store & Document;
 
@@ -16,6 +16,9 @@ export enum serviceType {
 
 @Schema({ timestamps: true })
 export class Store {
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Order' }) // ✅ Order reference (optional)
+  orderId?: string;
+
   @Prop({ required: true, type: String })
   userId: string;
 
@@ -25,9 +28,6 @@ export class Store {
   @Prop({ required: true })
   userPhone: string;
 
-  @Prop({ required: true })
-  storeId: string;
-
   @Prop()
   webImage?: string;
 
@@ -35,7 +35,7 @@ export class Store {
   appImage?: string;
 
   @Prop({ required: true })
-  pickupCenterName: string;
+  customerAddress: string;
 
   @Prop({ required: true })
   itemName: string;
@@ -48,6 +48,12 @@ export class Store {
 
   @Prop({ required: true, enum: serviceType })
   serviceType: serviceType;
+
+  @Prop({ required: true }) // ✅ **Add orderNumber**
+  orderNumber: string;
+
+  @Prop({ required: true }) // ✅ **Add finalAmount**
+  finalAmount: number;
 }
 
 export const StoreSchema = SchemaFactory.createForClass(Store);
