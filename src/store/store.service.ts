@@ -36,25 +36,41 @@ export class StoreService {
         ? fileUpload('store/webImage', files.web_image[0])
         : null;
 
-      //   console.log('webImage is: ', webImage);
-
       const appImage = files?.app_image?.[0]
         ? fileUpload('store/appImage', files.app_image[0])
         : null;
 
-      //   console.log('appImage is: ', appImage);
       storeDto['webImage'] =
         `${process.env.SERVER_BASE_URL}/uploads/store/webImage/${webImage}`;
 
       storeDto['appImage'] =
         `${process.env.SERVER_BASE_URL}/uploads/store/appImage/${appImage}`;
 
-      const newOrder = new this.storeModel(storeDto);
-      const saveNewOrder = await newOrder.save();
+      // 🔥 **Latest Order Fetch Karna**
+      const order = await this.orderModel
+        .findOne()
+        .sort({ createdAt: -1 })
+        .exec();
+
+      if (!order) {
+        return new CustomResponse(HttpStatus.NOT_FOUND, 'No orders found.');
+      }
+
+      // ✅ **Order Details Store Karna**
+      storeDto['orderNumber'] = order.orderNumber;
+      storeDto['finalAmount'] = order.finalAmount;
+
+      const newOrder = new this.storeModel({
+        ...storeDto,
+        orderNumber: order.orderNumber,
+        finalAmount: order.finalAmount,
+      });
+      const savedOrder = await newOrder.save();
+
       return new CustomResponse(
         HttpStatus.OK,
         'Store Order Saved Successfully',
-        saveNewOrder,
+        savedOrder,
       );
     } catch (error) {
       console.error('Error in createStoreOrder:', error);
@@ -134,6 +150,25 @@ export class StoreService {
         history,
       );
     } catch (error) {
+      throwException(error);
+    }
+  }
+
+  async getStoreOrderByOrderNumber(orderNumber: string) {
+    try {
+      const order = await this.storeModel.findOne({ orderNumber }).exec();
+
+      if (!order) {
+        return new CustomResponse(HttpStatus.NOT_FOUND, 'No order found.');
+      }
+
+      return new CustomResponse(
+        HttpStatus.OK,
+        'Order found successfully.',
+        order,
+      );
+    } catch (error) {
+      console.error('Error in getStoreOrderByOrderNumber:', error);
       throwException(error);
     }
   }

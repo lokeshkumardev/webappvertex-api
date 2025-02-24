@@ -48,10 +48,10 @@ export class StoreController {
   async getFilteredStores(@Query() filterDto: StoreDto) {
     return this.storeService.getFilteredStores(filterDto);
   }
-  @Get(':storeId')
-  async getStoreOrders(@Param('storeId') storeId: string) {
-    return this.storeService.getStoreOrders(storeId);
-  }
+  // @Get(':storeId')
+  // async getStoreOrders(@Param('storeId') storeId: string) {
+  //   return this.storeService.getStoreOrders(storeId);
+  // }
   @Get('history/:userId')
   async getUserHistory(@Param('userId') userId: string) {
     return this.storeService.getUserHistory(userId);
@@ -60,5 +60,10 @@ export class StoreController {
   @Delete(':id')
   async deleteStoreOrders(@Param('id') id: string) {
     return this.storeService.deleteStoreOrders(id);
+  }
+
+  @Get('/getStoreByOrderNumber/:orderNumber')
+  async getOrder(@Param('orderNumber') orderNumber: string) {
+    return this.storeService.getStoreOrderByOrderNumber(orderNumber);
   }
 }

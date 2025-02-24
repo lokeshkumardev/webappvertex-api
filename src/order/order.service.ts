@@ -53,8 +53,10 @@ export class OrderService {
     const discountAmount = (totalAmount * discount) / 100;
     const specialOfferAmount = (totalAmount * specialOffer) / 100;
     const finalAmount = totalAmount - discountAmount - specialOfferAmount;
-
+    const orderNumber = `${Math.floor(Math.random() * 10000)}`;
+    createOrderDto.orderNumber = orderNumber;
     const newOrder = new this.orderModel({
+      orderNumber,
       userId,
       serviceType,
       address,
@@ -105,7 +107,7 @@ export class OrderService {
     const razorpayOrder = await this.razorpayInstance.orders.create({
       amount: 100,
       currency: 'INR',
-      receipt: 'ord2828389',
+      receipt: `ORD-${order._id}`,
       payment_capture: true,
     });
 

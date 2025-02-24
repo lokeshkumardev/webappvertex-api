@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Patch,
+  Delete,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 
 @Controller('orders')
@@ -26,14 +34,14 @@ export class OrderController {
   }
 
   @Get('getOrderHistoryByUrserId/:userId')
-    async getOrderHistoryByUrserId(@Param('userId') userId: string) {
+  async getOrderHistoryByUrserId(@Param('userId') userId: string) {
     return this.orderService.getOrderHistoryByUrserId(userId);
   }
 
   @Post('webhook')
   async handleWebhook(@Body() body: any) {
     return this.orderService.verifyPayment(body);
-  } 
+  }
 
   @Post(':id/refund')
   async refundPayment(@Param('id') orderId: string) {

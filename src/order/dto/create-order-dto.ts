@@ -1,6 +1,7 @@
 import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateOrderDto {
+  orderNumber: string;
   // @IsString()
   // @IsNotEmpty()
   userId: string;
