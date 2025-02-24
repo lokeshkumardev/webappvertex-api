@@ -88,7 +88,6 @@ export class CategoryService {
           (file) => file.fieldname === 'web_image',
         );
         if (webImageFile) {
-          const fileName = fileUpload('banners/webImage', webImageFile);
           const webImage = fileUpload(
             'category/webImage',
             webImageFile || null,

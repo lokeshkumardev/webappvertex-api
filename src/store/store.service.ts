@@ -87,7 +87,8 @@ export class StoreService {
   }
 
   async getStoreOrders(storeId: string) {
-    return await this.storeModel.find({ storeId }).exec();
+    const getStore = await this.storeModel.find({ storeId }).exec();
+    return new CustomResponse(200, 'Store Retrived Successfully', getStore);
   }
 
   async updateOrderStatus(orderId: string, status: OrderStatus) {

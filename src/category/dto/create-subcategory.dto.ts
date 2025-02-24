@@ -1,4 +1,5 @@
 // src/dto/subcategory.dto.ts
+
 export class CreateSubcategoryDTO {
   name: string;
   description: string;
@@ -7,12 +8,16 @@ export class CreateSubcategoryDTO {
   app_image?: string[]; // Separate for app images
   price?: number;
   rating?: number;
+  ExtraMeal?: {
+    roti: string;
+    price: string;
+  }[];
   offer?: string;
   categoryId: string;
   userType: 'daily' | 'permanent';
   meta_title?: string;
   meta_description?: string;
-  is_published?: boolean; 
+  is_published?: boolean;
 }
 
 export class UpdateSubcategoryDTO {
@@ -23,10 +28,14 @@ export class UpdateSubcategoryDTO {
   app_image?: string[]; // Separate for app images
   price?: number;
   rating?: number;
+  ExtraMeal?: {
+    roti: string;
+    price: string;
+  }[];
   offer?: string;
-  categoryId:string;
+  categoryId: string;
   userType?: 'daily' | 'permanent';
   meta_title?: string;
   meta_description?: string;
-  is_published?: boolean; 
+  is_published?: boolean;
 }
