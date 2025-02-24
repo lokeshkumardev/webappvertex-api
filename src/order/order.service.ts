@@ -11,6 +11,7 @@ import CustomResponse from 'src/common/providers/custom-response.service';
 import CustomError from 'src/common/providers/customer-error.service';
 import { User } from 'src/user/interface/user.interface';
 import * as dotenv from 'dotenv';
+import { throwException } from 'src/util/errorhandling';
 
 dotenv.config({ path: './.env' });
 
@@ -156,6 +157,8 @@ export class OrderService {
     return new CustomResponse(200, 'Payment verified successfully', order);
   }
 
+  
+
   /**
    * ✅ Refund Payment
    */
@@ -210,6 +213,20 @@ export class OrderService {
     if (!orders.length) throw new CustomError(404, 'No Orders Found for this User');
   
     return new CustomResponse(200,'Order History Fetch SuccessFully ',orders);
+  }
+  async getPaymentStatus(id: string,paymentStatus:any) {
+   try {
+   
+     const order = await this.orderModel.findById(id);
+     if (!order) throw new CustomError(404, 'Order not found');
+     var paymentStatus=paymentStatus;
+    const res= await this.orderModel.findByIdAndUpdate(id, paymentStatus, { new: true }).exec();
+    return new CustomResponse(200,'Payment Status Updated !',res);
+   } catch (error) {
+    throwException(error)
+    
+   }
+  
   }
   
 }
