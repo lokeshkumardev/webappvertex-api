@@ -36,4 +36,11 @@ export class UpdateSubcategoryDto {
   @IsOptional()
   @IsString()
   metaDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  ExtraMeal?: {
+    roti: string;
+    price: string;
+  }[];
 }

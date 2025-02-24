@@ -15,38 +15,35 @@ export enum OrderStatus {
 }
 
 export class StoreDto {
-  //   @IsNotEmpty()
-  //   @IsString()
+  orderId?: string;
+  @IsNotEmpty()
+  @IsString()
   userName: string;
 
-  //   @IsNotEmpty()
-  //   @IsString()
+  @IsNotEmpty()
+  @IsString()
   userPhone: string;
 
-  //   @IsNotEmpty()
-  //   @IsMongoId()
-  storeId: string;
-
-  //   @IsOptional()
+  @IsOptional()
   webImage?: string;
 
-  //   @IsOptional()
+  @IsOptional()
   appImage?: string;
 
-  //   @IsNotEmpty()
-  //   @IsString()
-  pickupCenterName: string;
+  @IsNotEmpty()
+  @IsString()
+  customerAddress: string;
 
-  //   @IsNotEmpty()
-  //   @IsString()
+  @IsNotEmpty()
+  @IsString()
   itemName: string;
 
-  //   @IsNotEmpty()
-  //   @IsNumber()
+  // @IsNotEmpty()
+  // @IsNumber()
   quantity: number;
 
-  //   @IsNotEmpty()
-  // @IsEnum(OrderStatus)
+  @IsNotEmpty()
+  @IsEnum(OrderStatus)
   status: OrderStatus;
 
   serviceType: serviceType;

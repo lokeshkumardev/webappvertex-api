@@ -28,40 +28,83 @@ export class SubcategoryService {
     files: any,
   ) {
     try {
-      if (!createSubcategoryDto || !files) {
-        throw new NotFoundException(400, 'Missing required fields or files');
+      if (!createSubcategoryDto) {
+        throw new NotFoundException(400, 'Missing required fields');
       }
+
+      if (createSubcategoryDto.ExtraMeal) {
+        try {
+          // ✅ Parse JSON only if it's a string
+          if (typeof createSubcategoryDto.ExtraMeal === 'string') {
+            createSubcategoryDto.ExtraMeal = JSON.parse(
+              createSubcategoryDto.ExtraMeal,
+            );
+          }
+
+          // ✅ Ensure it's an array
+          if (!Array.isArray(createSubcategoryDto.ExtraMeal)) {
+            throw new CustomError(
+              501,
+              'Invalid ExtraMeal format, must be an array',
+            );
+          }
+
+          // ✅ Initialize total price with the main price
+          let totalPrice = createSubcategoryDto.price
+            ? Number(createSubcategoryDto.price)
+            : 0;
+
+          // ✅ Calculate ExtraMeal price dynamically
+          createSubcategoryDto.ExtraMeal.forEach((item) => {
+            const rotiCount = Number(item.roti); // Convert roti count to number
+            const rotiPrice = Number(item.price); // Price of one roti
+
+            if (isNaN(rotiCount) || isNaN(rotiPrice)) {
+              throw new CustomError(
+                501,
+                'Invalid roti or price value in ExtraMeal',
+              );
+            }
+
+            totalPrice += rotiCount * rotiPrice; // Multiply and add to total price
+          });
+
+          // ✅ Assign the updated total price
+          createSubcategoryDto.price = totalPrice;
+        } catch (error) {
+          throw new CustomError(501, 'Invalid JSON format for ExtraMeal');
+        }
+      }
+
+      // ✅ Handle File Uploads
       const webImageFile = files.find((file) => file.fieldname === 'web_image');
       const appImageFile = files.find((file) => file.fieldname === 'app_image');
 
-      // Upload files using your fileUpload function
       const webImage = fileUpload('subcategory/webImage', webImageFile || null);
+      const appImage = fileUpload('subcategory/appImage', appImageFile || null);
+
       createSubcategoryDto['web_image'] = webImage
         ? [
             `${process.env.SERVER_BASE_URL}uploads/subcategory/webImage/${webImage}`,
           ]
         : [];
-      const appImage = fileUpload('subcategory/appImage', appImageFile || null);
+
       createSubcategoryDto['app_image'] = appImage
         ? [
             `${process.env.SERVER_BASE_URL}uploads/subcategory/appImage/${appImage}`,
           ]
         : [];
-      const category = await this.categoryModel.findById(
-        createSubcategoryDto.categoryId,
-      );
-      if (!category) {
-        throw new NotFoundException('Category not found');
-      }
-      // const categoryBySlug = await this.categoryModel.findOne({ slug: createSubcategoryDto.slug });
-      // if (!categoryBySlug) {
-      //   throw new NotFoundException('Category with the specified slug not found');
-      // }
+
+      // // ✅ Add parsed ExtraMeal to DTO
+      // createSubcategoryDto.ExtraMeal = createSubcategoryDto.ExtraMeal;
+
+      // ✅ Save to Database
       const subcategory = new this.subcategoryModel(createSubcategoryDto);
       const subSave = await subcategory.save();
+
       return new CustomResponse(
         HttpStatus.OK,
-        'CreateSubcategory Save SuccessFully',
+        'CreateSubcategory Save Successfully',
         subSave,
       );
     } catch (error) {

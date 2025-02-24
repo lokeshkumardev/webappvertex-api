@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, Get } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service'; // Import AuthService to use OTP functionality
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -9,9 +9,8 @@ import { ROUTE } from 'src/util/constants';
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly authService: AuthService,  // Inject AuthService for OTP handling
-  ) { }
-
+    private readonly authService: AuthService, // Inject AuthService for OTP handling
+  ) {}
 
   @Post('craete-user')
   async create(@Body() createUserDto: CreateUserDto) {
@@ -19,4 +18,14 @@ export class UserController {
   }
 
   // Other user CRUD operations (create, update, delete, etc.) remain unchanged
+
+  @Get('getUser/:userId')
+  async findById(@Param('userId') userId: string) {
+    return this.userService.findById(userId);
+  }
+
+  // @Get('getAdminbyUserName/:username')
+  // async findAdminByUsername(@Param('username') username: string) {
+  //   return this.userService.findAdminByUsername(username);
+  // }
 }
