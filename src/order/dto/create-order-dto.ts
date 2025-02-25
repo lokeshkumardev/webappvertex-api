@@ -1,7 +1,7 @@
 import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateOrderDto {
-  orderNumber: string;
+  // orderNumber: string;
   // @IsString()
   // @IsNotEmpty()
   userId: string;
@@ -20,13 +20,13 @@ export class CreateOrderDto {
 
   @IsOptional()
   @IsNumber()
-  specialOffer?: number; // Percentage, default 0
+  specialOffer?: string; // Percentage, default 0
 
   @IsOptional()
   @IsNumber()
-  discount?: number; // Percentage, default 0
+  discount?: string; // Percentage, default 0
 
   @IsOptional()
   @IsNumber()
-  totalQuantity?: number; // Default is 1
+  totalQuantity?: string; // Default is 1
 }
