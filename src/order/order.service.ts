@@ -35,6 +35,7 @@ export class OrderService {
    * ✅ Create a new order
    */
   async createOrder(createOrderDto: CreateOrderDto) {
+    try{
     const {
       userId,
       serviceType,
@@ -72,6 +73,9 @@ export class OrderService {
 
     const savedOrder = await newOrder.save();
     return new CustomResponse(200, 'Order Created Successfully', savedOrder);
+    }catch(error){
+      throwException(error)
+    }
   }
 
   /**
