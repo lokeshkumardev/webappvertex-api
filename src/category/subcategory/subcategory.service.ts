@@ -28,53 +28,41 @@ export class SubcategoryService {
     files: any,
   ) {
     try {
-      if (!createSubcategoryDto) {
-        throw new NotFoundException(400, 'Missing required fields');
-      }
-
-      if (createSubcategoryDto.ExtraMeal) {
+      if (typeof createSubcategoryDto.ExtraMeal === 'string') {
         try {
-          // ✅ Parse JSON only if it's a string
-          if (typeof createSubcategoryDto.ExtraMeal === 'string') {
-            createSubcategoryDto.ExtraMeal = JSON.parse(
-              createSubcategoryDto.ExtraMeal,
-            );
-          }
-
-          // ✅ Ensure it's an array
-          if (!Array.isArray(createSubcategoryDto.ExtraMeal)) {
-            throw new CustomError(
-              501,
-              'Invalid ExtraMeal format, must be an array',
-            );
-          }
-
-          // ✅ Initialize total price with the main price
-          let totalPrice = createSubcategoryDto.price
-            ? Number(createSubcategoryDto.price)
-            : 0;
-
-          // ✅ Calculate ExtraMeal price dynamically
-          createSubcategoryDto.ExtraMeal.forEach((item) => {
-            const rotiCount = Number(item.roti); // Convert roti count to number
-            const rotiPrice = Number(item.price); // Price of one roti
-
-            if (isNaN(rotiCount) || isNaN(rotiPrice)) {
-              throw new CustomError(
-                501,
-                'Invalid roti or price value in ExtraMeal',
-              );
-            }
-
-            totalPrice += rotiCount * rotiPrice; // Multiply and add to total price
-          });
-
-          // ✅ Assign the updated total price
-          createSubcategoryDto.price = totalPrice;
+          createSubcategoryDto.ExtraMeal = JSON.parse(
+            createSubcategoryDto.ExtraMeal,
+          );
         } catch (error) {
-          throw new CustomError(501, 'Invalid JSON format for ExtraMeal');
+          throw new CustomError(400, 'Invalid JSON format for ExtraMeal');
         }
       }
+
+      // ✅ Ensure it's an array
+      if (!Array.isArray(createSubcategoryDto.ExtraMeal)) {
+        throw new CustomError(
+          400,
+          'Invalid ExtraMeal format, must be an array',
+        );
+      }
+
+      // ✅ Total price calculation
+      let totalPrice = createSubcategoryDto.price
+        ? Number(createSubcategoryDto.price)
+        : 0;
+
+      createSubcategoryDto.ExtraMeal.forEach((item) => {
+        const rotiPrice = Number(item.price); // Price of the extra meal
+
+        if (isNaN(rotiPrice)) {
+          throw new CustomError(400, 'Invalid price value in ExtraMeal');
+        }
+
+        totalPrice += rotiPrice; // Add price to total
+      });
+
+      // ✅ Assign the updated total price
+      createSubcategoryDto.price = totalPrice;
 
       // ✅ Handle File Uploads
       const webImageFile = files.find((file) => file.fieldname === 'web_image');

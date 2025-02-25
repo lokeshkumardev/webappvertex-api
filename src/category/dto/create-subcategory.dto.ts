@@ -9,7 +9,7 @@ export class CreateSubcategoryDTO {
   price?: number;
   rating?: number;
   ExtraMeal?: {
-    roti: string;
+    itemName: string;
     price: string;
   }[];
   offer?: string;
@@ -18,7 +18,7 @@ export class CreateSubcategoryDTO {
   meta_title?: string;
   meta_description?: string;
   is_published?: boolean;
-  serviceType?: string
+  serviceType?: string;
 }
 
 export class UpdateSubcategoryDTO {
@@ -30,7 +30,7 @@ export class UpdateSubcategoryDTO {
   price?: number;
   rating?: number;
   ExtraMeal?: {
-    roti: string;
+    itemName: string;
     price: string;
   }[];
   offer?: string;
@@ -39,5 +39,5 @@ export class UpdateSubcategoryDTO {
   meta_title?: string;
   meta_description?: string;
   is_published?: boolean;
-  categoryType?: string
+  categoryType?: string;
 }

@@ -35,46 +35,43 @@ export class OrderService {
    * ✅ Create a new order
    */
   async createOrder(createOrderDto: CreateOrderDto) {
-    try{
-    const {
-      userId,
-      serviceType,
-      address,
-      subCategoryId,
-      specialOffer = 0,
-      discount = 0,
-      totalQuantity = 1,
-    } = createOrderDto;
+    try {
+      const {
+        userId,
+        serviceType,
+        address,
+        subCategoryId,
+        specialOffer = '0',
+        discount = '0',
+        totalQuantity = '1',
+      } = createOrderDto;
 
-    const subcategory = await this.subcategoryModel.findById(subCategoryId);
-    if (!subcategory) throw new CustomResponse(404, 'Subcategory not found');
+      const subcategory = await this.subcategoryModel.findById(subCategoryId);
+      if (!subcategory) throw new CustomResponse(404, 'Subcategory not found');
 
-    const subCategoryPrice = subcategory.price;
-    const totalAmount = subCategoryPrice * totalQuantity;
+      const subCategoryPrice = Number(subcategory.price);
+      const totalAmount = subCategoryPrice * Number(totalQuantity);
 
-    const discountAmount = (totalAmount * discount) / 100;
-    const specialOfferAmount = (totalAmount * specialOffer) / 100;
-    const finalAmount = totalAmount - discountAmount - specialOfferAmount;
-    const orderNumber = `${Math.floor(Math.random() * 10000)}`;
-    createOrderDto.orderNumber = orderNumber;
-    const newOrder = new this.orderModel({
-      orderNumber,
-      userId,
-      serviceType,
-      address,
-      totalAmount,
-      finalAmount,
-      totalQuantity,
-      specialOffer,
-      discount,
-      subCategoryId,
-      status: 'pending',
-    });
+      const discountAmount = (totalAmount * Number(discount)) / 100;
+      const specialOfferAmount = (totalAmount * Number(specialOffer)) / 100;
+      const finalAmount = totalAmount - discountAmount - specialOfferAmount;
+      const newOrder = new this.orderModel({
+        userId,
+        serviceType,
+        address,
+        totalAmount,
+        finalAmount,
+        totalQuantity,
+        specialOffer,
+        discount,
+        subCategoryId,
+        status: 'pending',
+      });
 
-    const savedOrder = await newOrder.save();
-    return new CustomResponse(200, 'Order Created Successfully', savedOrder);
-    }catch(error){
-      throwException(error)
+      const savedOrder = await newOrder.save();
+      return new CustomResponse(200, 'Order Created Successfully', savedOrder);
+    } catch (error) {
+      throwException(error);
     }
   }
 
@@ -84,8 +81,10 @@ export class OrderService {
   async getAllOrders() {
     const orders = await this.orderModel
       .find()
-      .populate('userId subCategoryId')
+      // .populate({ path: 'userId' })
+      .populate({ path: 'subCategoryId' })
       .exec();
+
     return new CustomResponse(200, 'All Orders Retrieved Successfully', orders);
   }
 
@@ -93,7 +92,11 @@ export class OrderService {
    * ✅ Get order by ID
    */
   async getOrderById(orderId: string) {
-    const order = await this.orderModel.findById(orderId);
+    const order = await this.orderModel
+      .findById(orderId)
+      // .populate({ path: 'userId' })
+      .populate({ path: 'subCategoryId' })
+      .exec();
     if (!order) throw new CustomError(404, 'Order not found');
     return new CustomResponse(200, 'Order fetched successfully', order);
   }
@@ -162,8 +165,6 @@ export class OrderService {
     return new CustomResponse(200, 'Payment verified successfully', order);
   }
 
-  
-
   /**
    * ✅ Refund Payment
    */
@@ -220,19 +221,17 @@ export class OrderService {
 
     return new CustomResponse(200, 'Order History Fetch SuccessFully ', orders);
   }
-  async getPaymentStatus(id: string,paymentStatus:any) {
-   try {
-   
-     const order = await this.orderModel.findById(id);
-     if (!order) throw new CustomError(404, 'Order not found');
-     var paymentStatus=paymentStatus;
-    const res= await this.orderModel.findByIdAndUpdate(id, paymentStatus, { new: true }).exec();
-    return new CustomResponse(200,'Payment Status Updated !',res);
-   } catch (error) {
-    throwException(error)
-    
-   }
-  
+  async getPaymentStatus(id: string, paymentStatus: any) {
+    try {
+      const order = await this.orderModel.findById(id);
+      if (!order) throw new CustomError(404, 'Order not found');
+      var paymentStatus = paymentStatus;
+      const res = await this.orderModel
+        .findByIdAndUpdate(id, paymentStatus, { new: true })
+        .exec();
+      return new CustomResponse(200, 'Payment Status Updated !', res);
+    } catch (error) {
+      throwException(error);
+    }
   }
-  
 }
