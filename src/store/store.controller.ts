@@ -66,4 +66,9 @@ export class StoreController {
   async getOrder(@Param('orderNumber') orderNumber: string) {
     return this.storeService.getStoreOrderByOrderNumber(orderNumber);
   }
+
+  @Get('getAllOrder')
+  async getAllOrder() {
+    return this.storeService.getAllOrder();
+  }
 }

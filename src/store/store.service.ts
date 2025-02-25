@@ -172,4 +172,20 @@ export class StoreService {
       throwException(error);
     }
   }
+
+  async getAllOrder() {
+    try {
+      const stores = await this.storeModel.find();
+      if (!stores || stores.length === 0) {
+        return new CustomResponse(HttpStatus.NOT_FOUND, 'No Stores found.');
+      }
+      return new CustomResponse(
+        HttpStatus.OK,
+        'Stores found successfully.',
+        stores,
+      );
+    } catch (error) {
+      throw new CustomError(500, error);
+    }
+  }
 }
