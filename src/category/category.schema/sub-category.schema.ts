@@ -50,13 +50,13 @@ export class Subcategory {
   @Prop({
     type: [
       {
-        roti: String,
-        price: String,
+        itemName: String,
+        price: Number,
       },
     ],
     default: [],
   })
-  ExtraMeal?: { roti: string; price: string }[];
+  ExtraMeal?: { itemName: string; price: string }[];
 }
 
 // Export the Mongoose schema
