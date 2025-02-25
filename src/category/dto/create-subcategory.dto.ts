@@ -18,6 +18,7 @@ export class CreateSubcategoryDTO {
   meta_title?: string;
   meta_description?: string;
   is_published?: boolean;
+  serviceType?: string
 }
 
 export class UpdateSubcategoryDTO {
@@ -38,4 +39,5 @@ export class UpdateSubcategoryDTO {
   meta_title?: string;
   meta_description?: string;
   is_published?: boolean;
+  categoryType?: string
 }

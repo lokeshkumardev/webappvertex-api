@@ -44,6 +44,8 @@ export class Subcategory {
 
   @Prop()
   is_published?: boolean;
+  @Prop()
+  categoryType?: string;
 
   @Prop({
     type: [

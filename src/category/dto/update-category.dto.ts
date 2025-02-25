@@ -12,6 +12,7 @@ export class UpdateCategoryDto {
   @IsString()
   @IsOptional()
   web_image?: string;
+  categoryType?: string
 
   
 }

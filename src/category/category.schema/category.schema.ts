@@ -14,6 +14,7 @@ export interface ICategory {
   meta_description?: string;
   averageRating?: number;
   is_published?: boolean; // New field for publish/unpublish
+  categoryType?: string;
 }
 
 // Define the Category Schema using Mongoose decorators
@@ -48,6 +49,9 @@ export class Category {
 
   @Prop({ default: false }) // Default to unpublished
   is_published: boolean;
+  
+  @Prop({ required: false })
+  categoryType?: string;
 }
 
 // Create the Mongoose Schema for the Category class

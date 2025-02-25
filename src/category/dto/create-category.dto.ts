@@ -9,6 +9,7 @@ export class CreateCategoryDTO {
   meta_title?: string;
   meta_description?: string;
   is_published?: boolean; // Optional publish/unpublish field
+  categoryType?: string
 }
 
 export class UpdateCategoryDTO {
@@ -21,4 +22,5 @@ export class UpdateCategoryDTO {
   meta_description?: string;
   slug: string;
   is_published?: boolean; // Optional publish/unpublish field
+  categoryType?: string
 }
