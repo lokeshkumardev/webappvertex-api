@@ -81,8 +81,10 @@ export class OrderService {
   async getAllOrders() {
     const orders = await this.orderModel
       .find()
-      .populate('userId subCategoryId')
+      // .populate({ path: 'userId' })
+      .populate({ path: 'subCategoryId' })
       .exec();
+
     return new CustomResponse(200, 'All Orders Retrieved Successfully', orders);
   }
 
@@ -90,7 +92,11 @@ export class OrderService {
    * ✅ Get order by ID
    */
   async getOrderById(orderId: string) {
-    const order = await this.orderModel.findById(orderId);
+    const order = await this.orderModel
+      .findById(orderId)
+      // .populate({ path: 'userId' })
+      .populate({ path: 'subCategoryId' })
+      .exec();
     if (!order) throw new CustomError(404, 'Order not found');
     return new CustomResponse(200, 'Order fetched successfully', order);
   }
