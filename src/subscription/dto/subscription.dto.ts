@@ -18,12 +18,12 @@ export class SubscriptionDto {
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
-  OfferPrice: number;
+  OfferPrice: string;
 
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
-  totalAmount: number;
+  totalAmount: string;
 
   @IsNotEmpty()
   planId: string;
