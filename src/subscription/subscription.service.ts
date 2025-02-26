@@ -66,36 +66,48 @@ export class SubscriptionService {
         endDate: { $gte: new Date(date) }, // Check active subscription
       });
 
-      if (!subscription) throw new CustomResponse(400,'Subscription not found');
+      if (!subscription)
+        throw new CustomResponse(400, 'Subscription not found');
 
       const selectedDate = new Date(date);
 
       // Check if meal is already skipped
-      if (subscription.skippedDays.some((d) => d.toDateString() === selectedDate.toDateString())) {
+      if (
+        subscription.skippedDays.some(
+          (d) => d.toDateString() === selectedDate.toDateString(),
+        )
+      ) {
         throw new BadRequestException('Meal already skipped for this day');
       }
 
       // Calculate Per Day Amount
-      const perDayCost = subscription.totalAmount / subscription.planDays;
+      const perDayCost =
+        subscription.totalAmount / Number(subscription.validity);
 
       // Add date to skippedDays array
       subscription.skippedDays.push(selectedDate);
       await subscription.save();
 
       // Update Wallet
-      let wallet = await this.walletModel.findOne({ userId: new Types.ObjectId(userId) });
+      let wallet = await this.walletModel.findOne({
+        userId: new Types.ObjectId(userId),
+      });
 
       if (!wallet) {
-        wallet = new this.walletModel({ userId: new Types.ObjectId(userId), balance: perDayCost });
+        wallet = new this.walletModel({
+          userId: new Types.ObjectId(userId),
+          balance: perDayCost,
+        });
       } else {
         wallet.balance += perDayCost;
       }
 
       await wallet.save();
-      return new CustomResponse(200, 'Meal skipped and amount credited', { balance: wallet.balance });
+      return new CustomResponse(200, 'Meal skipped and amount credited', {
+        balance: wallet.balance,
+      });
     } catch (error) {
       throw throwException(error);
     }
   }
-  
 }
