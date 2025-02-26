@@ -111,7 +111,7 @@ export class OrderService {
 
     // Create Razorpay payment order
     const razorpayOrder = await this.razorpayInstance.orders.create({
-      amount: amount,
+      amount: amount * 100,
       currency: 'INR',
       receipt: `ORD-${order._id}`,
       payment_capture: true,
