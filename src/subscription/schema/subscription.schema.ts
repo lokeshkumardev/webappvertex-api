@@ -10,13 +10,13 @@ export class Subscription extends Document {
   userId: Types.ObjectId;
 
   @Prop({ type: String, required: true })
-  name: string;
+  planType: string;
 
   @Prop({ type: Number, required: true })
-  price: number;
+  OfferPrice: number;
 
-  @Prop({ required: true, enum: [15, 30] })
-  planDays: number;
+  @Prop({ required: true, enum: ['7 days', '15 days', '30 days'] })
+  validity: string;
 
   @Prop({ required: true })
   totalAmount: number; // Total price of plan
@@ -30,9 +30,8 @@ export class Subscription extends Document {
   @Prop({ type: [Date], default: [] })
   skippedDays: Date[];
 
-  @Prop({ type: [String], enum: ['breakfast', 'lunch', 'dinner'], default: [] }) 
+  @Prop({ type: [String], enum: ['breakfast', 'lunch', 'dinner'], default: [] })
   services: string[];
-
 }
 
 export const SubscriptionSchema = SchemaFactory.createForClass(Subscription);

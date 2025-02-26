@@ -1,24 +1,29 @@
-import { 
-  IsMongoId, 
-  IsNotEmpty, 
-  IsNumber, 
-  IsString, 
-  IsPositive, 
-  IsDateString, 
-  IsArray, 
-  ArrayNotEmpty ,
-  IsISO8601
+import {
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsPositive,
+  IsDateString,
+  IsArray,
+  ArrayNotEmpty,
+  IsISO8601,
 } from 'class-validator';
 
 export class SubscriptionDto {
   @IsNotEmpty()
   @IsString()
-  name: string;
+  planType: string;
 
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
-  price: number;
+  OfferPrice: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @IsPositive()
+  totalAmount: number;
 
   @IsNotEmpty()
   planId: string;
@@ -27,9 +32,9 @@ export class SubscriptionDto {
   userId: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
-  planDays: number; // 15 or 30 days
+  // @IsNumber()
+  // @IsPositive()
+  validity: string; // 15 or 30 days
 
   @IsNotEmpty()
   @IsDateString()
@@ -38,7 +43,6 @@ export class SubscriptionDto {
   @IsNotEmpty()
   @IsDateString()
   endDate: string; // YYYY-MM-DD format
-
 
   skippedDays: string[]; // Array of skipped dates
 }
