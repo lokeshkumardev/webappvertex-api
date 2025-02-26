@@ -12,14 +12,14 @@ export class Subscription extends Document {
   @Prop({ type: String, required: true })
   planType: string;
 
-  @Prop({ type: Number, required: true })
-  OfferPrice: number;
+  @Prop({ type: String, required: true })
+  OfferPrice: string;
 
   @Prop({ required: true, enum: ['7 days', '15 days', '30 days'] })
   validity: string;
 
   @Prop({ required: true })
-  totalAmount: number; // Total price of plan
+  totalAmount: string; // Total price of plan
 
   @Prop({ required: true })
   startDate: Date;

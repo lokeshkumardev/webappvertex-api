@@ -7,6 +7,7 @@ import CustomError from 'src/common/providers/customer-error.service';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import { throwException } from 'src/util/errorhandling';
 import { Wallet } from 'src/wallet/schema/wallet.schema';
+import { Plan } from 'src/plan/schema/plan.schema';
 
 @Injectable()
 export class SubscriptionService {
@@ -16,6 +17,9 @@ export class SubscriptionService {
 
     @InjectModel(Wallet.name) // Inject Wallet Model
     private readonly walletModel: Model<Wallet>,
+
+    @InjectModel(Plan.name)
+    private readonly planModel: Model<Plan>,
   ) {}
 
   // Method to create and save a new subscription
@@ -29,8 +33,15 @@ export class SubscriptionService {
         throw new CustomError(500, 'Invalid planId or userId');
       }
 
+      const plan = await this.planModel.findById(subscriptionDto.planId);
+      if (!plan) {
+        throw new CustomError(404, 'Plan not found');
+      }
+
       const newSubscription = new this.subscriptionModel({
         ...subscriptionDto,
+        price: plan.price, // ✅ Plan ka Price
+        offerPrice: plan.OfferPrice,
         planId: new Types.ObjectId(subscriptionDto.planId),
         userId: new Types.ObjectId(subscriptionDto.userId),
       });
@@ -82,7 +93,7 @@ export class SubscriptionService {
 
       // Calculate Per Day Amount
       const perDayCost =
-        subscription.totalAmount / Number(subscription.validity);
+        Number(subscription.totalAmount) / Number(subscription.validity);
 
       // Add date to skippedDays array
       subscription.skippedDays.push(selectedDate);
