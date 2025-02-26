@@ -17,7 +17,7 @@ export class PlanDto {
 
   @IsNotEmpty()
   @IsString()
-  validity: string;
+  planDays: string;
 
   // @IsNotEmpty()
   // @IsNumber()

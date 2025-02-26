@@ -34,14 +34,12 @@ export class SubcategoryService {
 
       if (createSubcategoryDto.ExtraMeal) {
         try {
-          // ✅ Parse JSON only if it's a string
           if (typeof createSubcategoryDto.ExtraMeal === 'string') {
             createSubcategoryDto.ExtraMeal = JSON.parse(
               createSubcategoryDto.ExtraMeal,
             );
           }
 
-          // ✅ Ensure it's an array
           if (!Array.isArray(createSubcategoryDto.ExtraMeal)) {
             throw new CustomError(
               501,
@@ -49,12 +47,10 @@ export class SubcategoryService {
             );
           }
 
-          // ✅ Initialize total price with the main price
           let totalPrice = createSubcategoryDto.price
             ? Number(createSubcategoryDto.price)
             : 0;
 
-          // ✅ Calculate ExtraMeal price dynamically
           createSubcategoryDto.ExtraMeal.forEach((item) => {
             const rotiCount = Number(item.roti); // Convert roti count to number
             const rotiPrice = Number(item.price); // Price of one roti
@@ -69,7 +65,6 @@ export class SubcategoryService {
             totalPrice += rotiCount * rotiPrice; // Multiply and add to total price
           });
 
-          // ✅ Assign the updated total price
           createSubcategoryDto.price = totalPrice;
         } catch (error) {
           throw new CustomError(501, 'Invalid JSON format for ExtraMeal');
@@ -281,7 +276,11 @@ export class SubcategoryService {
       for (const [key, value] of Object.entries(filters)) {
         if (value) {
           // For boolean filters like is_published, public
-          if (key === 'is_published' || key === 'categoryId') {
+          if (
+            key === 'is_published' ||
+            key === 'categoryId' ||
+            key === 'name'
+          ) {
             query[key] = value;
           }
           // For ObjectId based filter (e.g., filtering by _id)
