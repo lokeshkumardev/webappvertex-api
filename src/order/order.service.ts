@@ -41,7 +41,6 @@ export class OrderService {
         serviceType,
         address,
         subCategoryId,
-        amount,
         specialOffer = 0,
         discount = 0,
         totalQuantity = 1,
@@ -68,7 +67,6 @@ export class OrderService {
         totalQuantity,
         specialOffer,
         discount,
-        amount,
         subCategoryId,
         status: 'pending',
       });
@@ -106,13 +104,14 @@ export class OrderService {
   /**
    * ✅ Create Razorpay Payment Order
    */
-  async createPayment(orderId: string) {
+  async createPayment(orderId: string, amount: any) {
+    // console.log('amount', amount);
     const order = await this.orderModel.findById(orderId);
     if (!order) throw new CustomError(404, 'Order not found');
 
     // Create Razorpay payment order
     const razorpayOrder = await this.razorpayInstance.orders.create({
-      amount: 100,
+      amount: amount,
       currency: 'INR',
       receipt: `ORD-${order._id}`,
       payment_capture: true,

@@ -19,9 +19,9 @@ export class CreateOrderDto {
   // @IsNotEmpty()
   subCategoryId: string; // This references the Subcategory
 
-  @IsString()
-  @IsNotEmpty()
-  amount: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // amount: string;
 
   @IsOptional()
   @IsNumber()

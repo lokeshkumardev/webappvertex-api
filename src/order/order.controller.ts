@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Get, Param,Put, Patch, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Patch,
+  Delete,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 
 @Controller('orders')
@@ -21,8 +30,8 @@ export class OrderController {
   }
 
   @Post(':id/payment')
-  async createPayment(@Param('id') orderId: string) {
-    return this.orderService.createPayment(orderId);
+  async createPayment(@Param('id') orderId: string, @Body() amount: any) {
+    return this.orderService.createPayment(orderId, amount.amount);
   }
 
   @Get('getOrderHistoryByUrserId/:userId')
@@ -41,8 +50,10 @@ export class OrderController {
   }
 
   @Put('paytmentStatus/:id')
-  async checkPaymentStatus(@Param('id') id: string,@Body()paymentStatus:string) {
-    return  this.orderService.getPaymentStatus(id,paymentStatus);
-    
+  async checkPaymentStatus(
+    @Param('id') id: string,
+    @Body() paymentStatus: string,
+  ) {
+    return this.orderService.getPaymentStatus(id, paymentStatus);
   }
 }
