@@ -138,12 +138,17 @@ export class StoreService {
 
   async getUserHistory(userId: string) {
     try {
-      const history = await this.orderModel.find({ userId }).exec();
+      const history = await this.orderModel
+        .find({ userId })
+        .populate({
+          path: 'subCategoryId',
+          select: 'web_image app_image',
+        })
+        .exec();
 
       if (!history.length) {
         return new CustomResponse(404, 'No history found for this user');
       }
-
       return new CustomResponse(
         200,
         'User history fetched successfully',

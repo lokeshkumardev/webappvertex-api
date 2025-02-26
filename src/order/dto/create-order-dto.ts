@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { StringExpression } from 'mongoose';
 
 export class CreateOrderDto {
   orderNumber: string;
@@ -17,6 +18,10 @@ export class CreateOrderDto {
   // @IsString()
   // @IsNotEmpty()
   subCategoryId: string; // This references the Subcategory
+
+  @IsString()
+  @IsNotEmpty()
+  amount: string;
 
   @IsOptional()
   @IsNumber()
