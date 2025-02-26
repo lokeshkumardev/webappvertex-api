@@ -11,7 +11,7 @@ export class Plan extends Document {
   title: string;
 
   @Prop({ required: true })
-  validity: string;
+  planDays: string;
 
   @Prop({ required: true })
   price: number;

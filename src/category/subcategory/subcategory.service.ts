@@ -281,7 +281,11 @@ export class SubcategoryService {
       for (const [key, value] of Object.entries(filters)) {
         if (value) {
           // For boolean filters like is_published, public
-          if (key === 'is_published' || key === 'categoryId') {
+          if (
+            key === 'is_published' ||
+            key === 'categoryId' ||
+            key === '3-in-1'
+          ) {
             query[key] = value;
           }
           // For ObjectId based filter (e.g., filtering by _id)
