@@ -142,7 +142,7 @@ export class StoreService {
         .find({ userId })
         .populate({
           path: 'subCategoryId',
-          select: 'web_image app_image',
+          select: 'name web_image app_image',
         })
         .exec();
 
