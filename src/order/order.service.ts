@@ -120,13 +120,8 @@ export class OrderService {
     // Save the Razorpay order ID in the database
     order.razorpayOrderId = razorpayOrder.id;
     await order.save();
-
-    // Razorpay payment link
-    const paymentLink = `https://checkout.razorpay.com/v1/checkout.js?order_id=${razorpayOrder.id}`;
-
     return new CustomResponse(200, 'Payment Order Created', {
-      razorpayOrder,
-      paymentLink, // Provide the payment link to the user
+      razorpayOrder // Provide the payment link to the user
     });
   }
 
@@ -135,20 +130,20 @@ export class OrderService {
    */
   async verifyPayment(body: any) {
     const { event, payload } = body;
-    console.log(body);
+ 
     if (event !== 'payment.captured')
       return new CustomResponse(400, 'Invalid event type');
 
-    const { order_id, id: paymentId, signature } = payload.payment.entity;
+    const { razorpayOrderId, id: paymentId, signature } = payload.payment.entity;
 
-    const order = await this.orderModel.findOne({ razorpayOrderId: order_id });
+    const order = await this.orderModel.findOne({ razorpayOrderId: razorpayOrderId });
     if (!order) throw new CustomError(404, 'Order not found');
 
     const expectedSignature = createHmac(
       'sha256',
       process.env.RAZORPAY_KEY_SECRET as string,
     )
-      .update(order_id + '|' + paymentId)
+      .update(razorpayOrderId + '|' + paymentId)  
       .digest('hex');
 
     if (signature !== expectedSignature)
@@ -157,7 +152,7 @@ export class OrderService {
     order.razorpayPaymentId = paymentId;
     order.razorpaySignature = signature;
     order.paymentStatus = 'paid';
-    order.status = 'paid';
+    // order.status = 'paid';
     await order.save();
 
     return new CustomResponse(200, 'Payment verified successfully', order);
