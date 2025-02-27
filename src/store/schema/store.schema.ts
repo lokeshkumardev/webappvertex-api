@@ -19,6 +19,9 @@ export class Store {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Order' }) // ✅ Order reference (optional)
   orderId?: string;
 
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Rider' }) // ✅ Order reference (optional)
+  riderId?: string;
+
   @Prop({ required: true, type: String })
   userId: string;
 

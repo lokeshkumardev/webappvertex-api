@@ -16,12 +16,16 @@ export enum OrderStatus {
 
 export class StoreDto {
   orderId?: string;
-  @IsNotEmpty()
-  @IsString()
+
+  // @IsNotEmpty()
+  riderId?: string;
+
+  // @IsNotEmpty()
+  // @IsString()
   userName: string;
 
-  @IsNotEmpty()
-  @IsString()
+  // @IsNotEmpty()
+  // @IsString()
   userPhone: string;
 
   @IsOptional()
@@ -30,20 +34,20 @@ export class StoreDto {
   @IsOptional()
   appImage?: string;
 
-  @IsNotEmpty()
-  @IsString()
+  // @IsNotEmpty()
+  // @IsString()
   customerAddress: string;
 
-  @IsNotEmpty()
-  @IsString()
+  // @IsNotEmpty()
+  // @IsString()
   itemName: string;
 
   // @IsNotEmpty()
   // @IsNumber()
   quantity: number;
 
-  @IsNotEmpty()
-  @IsEnum(OrderStatus)
+  // @IsNotEmpty()
+  // @IsEnum(OrderStatus)
   status: OrderStatus;
 
   serviceType: serviceType;
