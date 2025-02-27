@@ -125,38 +125,71 @@ export class OrderService {
     });
   }
 
-  /**
-   * ✅ Verify Razorpay Payment
-   */
+
   async verifyPayment(body: any) {
     const { event, payload } = body;
- 
-    if (event !== 'payment.captured')
+
+    // Log the payload for debugging
+    console.log('payload.payment.entity', payload?.payment?.entity);
+
+    // Check if event is 'payment.captured'
+    if (event !== 'payment.captured') {
       return new CustomResponse(400, 'Invalid event type');
+    }
 
-    const { razorpayOrderId, id: paymentId, signature } = payload.payment.entity;
+    // Check if payload.payment.entity exists
+    if (!payload?.payment?.entity) {
+      return new CustomResponse(400, 'Payment entity is missing');
+    }
 
-    const order = await this.orderModel.findOne({ razorpayOrderId: razorpayOrderId });
-    if (!order) throw new CustomError(404, 'Order not found');
+    const { id: paymentId, razorpayOrderId, signature } = payload.payment.entity;
 
-    const expectedSignature = createHmac(
-      'sha256',
-      process.env.RAZORPAY_KEY_SECRET as string,
-    )
-      .update(razorpayOrderId + '|' + paymentId)  
-      .digest('hex');
+    // Check if all required fields are present
+    if (!paymentId || !razorpayOrderId || !signature) {
+      return new CustomResponse(400, 'Missing payment details');
+    }
 
-    if (signature !== expectedSignature)
-      throw new CustomError(400, 'Invalid payment signature');
+    // Log the extracted payment details
 
-    order.razorpayPaymentId = paymentId;
-    order.razorpaySignature = signature;
-    order.paymentStatus = 'paid';
-    // order.status = 'paid';
-    await order.save();
 
-    return new CustomResponse(200, 'Payment verified successfully', order);
+    try {
+
+      const order = await this.orderModel.findOne({
+        razorpayOrderId: { $regex: new RegExp(`^${razorpayOrderId}$`, 'i') }
+      });
+
+
+      if (!order) {
+        throw new CustomError(404, 'Order not found');
+      }
+
+      // Generate the expected signature using HMAC
+      const expectedSignature = createHmac('sha256', process.env.RAZORPAY_KEY_SECRET as string)
+        .update(razorpayOrderId + '|' + paymentId)
+        .digest('hex');
+
+      // Compare the signatures to ensure payment validity
+      if (signature !== expectedSignature) {
+        throw new CustomError(400, 'Invalid payment signature');
+      }
+
+      // Update the order with payment details
+      order.razorpayPaymentId = paymentId;
+      order.razorpaySignature = signature;
+      order.paymentStatus = 'paid';
+      // order.status = 'paid'; // Unnecessary if the status is already 'paid'
+      await order.save();
+
+      // Return success response
+      return new CustomResponse(200, 'Payment verified successfully', order);
+
+    } catch (error) {
+      // Catch any errors and return a clear response
+      console.error('Error verifying payment:', error);
+      return new CustomResponse(error.statusCode || 500, error.message || 'An error occurred while verifying payment');
+    }
   }
+
 
   /**
    * ✅ Refund Payment
