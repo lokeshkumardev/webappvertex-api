@@ -82,10 +82,13 @@ export class StoreService {
     try {
       const query: any = {};
 
-      if (filters.serviceType) {
-        query.serviceType = filters.serviceType; // Exact match
+      for (const [key, value] of Object.entries(filters)) {
+        if (!value) continue;
+        if (key === 'id' && Types.ObjectId.isValid(value))
+          query._id = new Types.ObjectId(value);
+        else if (['sotre', 'riderId'].includes(key)) query[key] = value;
+        else query[key] = { $regex: value, $options: 'i' };
       }
-
       const stores = await this.storeModel.find(query).exec();
 
       if (!stores.length) {
@@ -173,7 +176,7 @@ export class StoreService {
         order,
       );
     } catch (error) {
-      console.error('Error in getStoreOrderByOrderNumber:', error);
+      // console.error('Error in getStoreOrderByOrderNumber:', error);
       throwException(error);
     }
   }
