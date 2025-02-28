@@ -75,5 +75,25 @@ export class UserService {
     return this.userModel.findOne({ username, isAdmin: true }).exec(); // Assuming `isAdmin` flag
   }
 
+  async updateUserByUserId(userId: string, updateData: Partial<CreateUserDto>) {
+    try {
+      const user = await this.userModel.findById(userId).exec();
+      if (!user) {
+        throw new CustomResponse(404, 'User not found');
+      }
+
+      const updatedUser = await this.userModel
+        .findByIdAndUpdate(userId, updateData, {
+          new: true,
+          runValidators: true,
+        })
+        .exec();
+
+      return new CustomResponse(200, 'User updated successfully', updatedUser);
+    } catch (error) {
+      throwException(error);
+    }
+  }
+
   // Other user CRUD operations (create, update, delete, etc.)
 }

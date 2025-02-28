@@ -8,6 +8,7 @@ import CustomResponse from 'src/common/providers/custom-response.service';
 import { User } from 'src/user/interface/user.interface';
 import CustomError from 'src/common/providers/customer-error.service';
 import { RiderDocument } from './rider.schema/document.schema';
+import { throwException } from 'src/util/errorhandling';
 
 @Injectable()
 export class RiderService {
@@ -148,6 +149,51 @@ export class RiderService {
       return new CustomResponse(200, 'Documents retrieved successfully', rider);
     } catch (error) {
       throw new CustomError(500, error.message || 'Internal Server Error');
+    }
+  }
+
+  async updateRiderStatus(id: string, status: boolean) {
+    try {
+      const updatedRider = await this.riderModel.findByIdAndUpdate(
+        id,
+        { status }, // ✅ Direct status update
+        { new: true }, // ✅ Updated document return karega
+      );
+
+      if (!updatedRider) {
+        throw new CustomError(404, 'Rider not found');
+      }
+
+      return new CustomResponse(
+        200,
+        'Status Updated Successfully',
+        updatedRider,
+      );
+    } catch (error) {
+      throw new CustomError(500, 'Internal Server Error');
+    }
+  }
+
+  async updateDocumentStatus(riderId: string, status: boolean) {
+    try {
+      const updatedDocument = await this.documentModel.findOneAndUpdate(
+        { riderId: riderId }, // 🔍 Rider ke documents dhoondo
+        { $set: { status: status } }, // ✅ Status update karo
+        { new: true }, // 🔄 Updated document return karo
+      );
+
+      if (!updatedDocument) {
+        throw new CustomError(404, 'Document not found');
+      }
+
+      return new CustomResponse(
+        200,
+        'Status Updated Successfully',
+        updatedDocument,
+      );
+    } catch (error) {
+      console.error('Update Error:', error);
+      throw new CustomError(500, 'Internal Server Error');
     }
   }
 }

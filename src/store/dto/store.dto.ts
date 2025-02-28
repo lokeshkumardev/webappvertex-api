@@ -50,5 +50,7 @@ export class StoreDto {
   // @IsEnum(OrderStatus)
   status: OrderStatus;
 
+  orderNumber: string;
+
   serviceType: serviceType;
 }

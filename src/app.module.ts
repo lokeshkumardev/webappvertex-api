@@ -26,6 +26,7 @@ import { StoreController } from './store/store.controller';
 import { StoreModule } from './store/store.module';
 import { NotificationModule } from './notification/notification.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+// import { DocumentModule } from './rider/document/document.module';
 
 dotenv.config({ path: './.env' });
 @Module({
@@ -54,6 +55,7 @@ dotenv.config({ path: './.env' });
     StoreModule,
     NotificationModule,
     DashboardModule,
+    // DocumentModule,
   ],
   controllers: [AppController, StoreController],
   providers: [AppService, RazorpayService],

@@ -70,7 +70,6 @@ export class OrderService {
         subCategoryId,
         status: 'pending',
       });
-
       const savedOrder = await newOrder.save();
       return new CustomResponse(200, 'Order Created Successfully', savedOrder);
     } catch (error) {

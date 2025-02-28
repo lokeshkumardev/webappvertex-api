@@ -20,4 +20,6 @@ export class UploadDocumentsDto {
   @IsOptional()
   @IsString()
   drivingLicenseBack?: string;
+
+  status?: string;
 }

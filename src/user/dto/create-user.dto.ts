@@ -9,6 +9,8 @@ import {
 import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
+  userName: string;
+
   userType: string;
 
   userEmail: string;

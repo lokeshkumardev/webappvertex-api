@@ -7,10 +7,12 @@ import {
   Put,
   UseInterceptors,
   UploadedFiles,
+  Patch,
 } from '@nestjs/common';
 import { RiderService } from './rider.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { stat } from 'fs';
 
 @Controller('riders')
 export class RiderController {
@@ -66,5 +68,20 @@ export class RiderController {
   @Get(':riderId/documents')
   async getDocuments(@Param('riderId') riderId: string) {
     return this.riderService.getDocuments(riderId);
+  }
+  @Patch('updateRiderStatus/:id')
+  async updateRiderStatus(
+    @Param('id') id: string,
+    @Body('status') status: boolean,
+  ) {
+    return this.riderService.updateRiderStatus(id, status);
+  }
+
+  @Patch(':riderId/updatedocuments')
+  async updateDocumentStatus(
+    @Param('riderId') riderId: string,
+    @Body('status') status: boolean,
+  ) {
+    return this.riderService.updateDocumentStatus(riderId, status);
   }
 }

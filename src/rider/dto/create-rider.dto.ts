@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateRiderDto {
   @IsNotEmpty()
@@ -54,4 +54,8 @@ export class CreateRiderDto {
   @IsNotEmpty()
   @IsString()
   completeAddress: string;
+
+  // @IsNotEmpty()
+  // @IsBoolean()
+  status: boolean;
 }

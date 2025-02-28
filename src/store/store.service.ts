@@ -55,14 +55,15 @@ export class StoreService {
       if (!order) {
         return new CustomResponse(HttpStatus.NOT_FOUND, 'No orders found.');
       }
+      const orderNumber = `${Math.floor(Math.random() * 10000)}`;
 
       // ✅ **Order Details Store Karna**
-      storeDto['orderNumber'] = order.orderNumber;
+      // storeDto['orderNumber'] = order.orderNumber;
       storeDto['finalAmount'] = order.finalAmount;
 
       const newOrder = new this.storeModel({
         ...storeDto,
-        orderNumber: order.orderNumber,
+        orderNumber: orderNumber,
         finalAmount: order.finalAmount,
       });
       const savedOrder = await newOrder.save();
