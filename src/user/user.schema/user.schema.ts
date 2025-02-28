@@ -3,6 +3,7 @@ import { Schema } from 'mongoose';
 // Define User schema
 export const UserSchema = new Schema(
   {
+    userName: { type: String },
     userType: { type: String },
     userEmail: { type: String },
     userAddress: { type: String },

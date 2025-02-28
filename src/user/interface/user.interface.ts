@@ -2,6 +2,7 @@ import { Document } from 'mongoose';
 
 // User document interface (for TypeScript type safety)
 export interface User extends Document {
+  userName: string;
   userType: string;
   userEmail: string;
   userAddress: string;
