@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Get } from '@nestjs/common';
+import { Body, Controller, Param, Post, Get, Put } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service'; // Import AuthService to use OTP functionality
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -28,4 +28,12 @@ export class UserController {
   // async findAdminByUsername(@Param('username') username: string) {
   //   return this.userService.findAdminByUsername(username);
   // }
+
+  @Put('updateUser/:id')
+  async updateUser(
+    @Param('id') userId: string,
+    @Body() updateData: CreateUserDto,
+  ) {
+    return this.userService.updateUserByUserId(userId, updateData);
+  }
 }
