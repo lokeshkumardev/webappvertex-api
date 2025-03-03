@@ -21,7 +21,7 @@ export class UserService {
   constructor(@InjectModel('User') private userModel: Model<User>) {}
 
   async create(createUserDto: CreateUserDto) {
-    console.log('hiii', this.userModel);
+    // console.log('hiii', this.userModel);
     // Check if user email already exists
     try {
       if (!createUserDto.userEmail) {
