@@ -12,7 +12,7 @@ export class UserController {
     private readonly authService: AuthService, // Inject AuthService for OTP handling
   ) {}
 
-  @Post('craete-user')
+  @Post('create-user')
   async create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
@@ -20,14 +20,9 @@ export class UserController {
   // Other user CRUD operations (create, update, delete, etc.) remain unchanged
 
   @Get('getUser/:userId')
-  async findById(@Param('userId') userId: string) {
-    return this.userService.findById(userId);
+  async getUserById(@Param('userId') userId: string) {
+    return this.userService.findUserById(userId);
   }
-
-  // @Get('getAdminbyUserName/:username')
-  // async findAdminByUsername(@Param('username') username: string) {
-  //   return this.userService.findAdminByUsername(username);
-  // }
 
   @Put('updateUser/:id')
   async updateUser(
@@ -36,4 +31,7 @@ export class UserController {
   ) {
     return this.userService.updateUserByUserId(userId, updateData);
   }
+  // @Get('getAdminbyUserName/:username')
+  // async findAdminByUsername(@Param('username') username: string) {
+  // }
 }

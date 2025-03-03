@@ -8,7 +8,8 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]), // Register User schema
-    forwardRef(() => AuthModule), // If necessary, use forwardRef here for circular dependencies
+    forwardRef(() => AuthModule),
+    // If necessary, use forwardRef here for circular dependencies
   ],
   providers: [UserService],
   controllers: [UserController],
