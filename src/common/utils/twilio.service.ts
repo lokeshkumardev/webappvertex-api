@@ -9,7 +9,7 @@ export class TwilioService {
   private client: any;
 
   constructor() {
-    // console.log('Starting', process.env)
+    // console.log('Starting', process.env);
     const accountSid = process.env.TWILIO_ACCOUNT_SID as string; // Make sure this SID is correct
     const authToken = process.env.TWILIO_AUTH_TOKEN as string; // Make sure this Auth Token is correct
 
@@ -23,8 +23,7 @@ export class TwilioService {
 
   // Send OTP via Twilio SM
   async sendOTP(phoneNumber: string, otp: string): Promise<void> {
-    const message = `Your TSJ verification code is ${otp}. It will expire in 1 minutes. Do not share this code.  
-`;
+    const message = `Your TSJ verification code is ${otp}. It will expire in 1 minutes. Do not share this code.`;
     await this.client.messages.create({
       body: message,
       from: process.env.TWILIO_ACCOUNT_PHONE_NUMBER as string,

@@ -49,7 +49,10 @@ export class AuthService {
             otpExpiration: new Date(Date.now() + 1 * 60 * 1000), // OTP expiration set to 1 minutes
           },
         );
-        await this.twilioService.sendOTP(userPhone, otp);
+        // await this.twilioService.sendOTP(userPhone, otp);
+        const response = await this.twilioService.sendOTP(userPhone, otp);
+        console.log('Twilio Response:', response);
+
         return new CustomResponse(HttpStatus.OK, MESSAGE.OTP.SENT);
       }
     } catch (error) {
@@ -61,6 +64,7 @@ export class AuthService {
   async verifyOTP(createUserDto): Promise<any> {
     try {
       const userPhone = createUserDto.userPhone;
+
       const user = await this.userModel.findOne({ userPhone });
 
       // Check if OTP matches and if it is not expired
