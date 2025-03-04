@@ -16,7 +16,7 @@ export class CreateUserDto {
   userEmail: string;
 
   userAddress: string;
-  @IsString()
+  // @IsString()
   userPhone: string;
 
   userAge: number;
