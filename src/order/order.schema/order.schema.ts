@@ -1,8 +1,10 @@
 import { Schema, Document } from 'mongoose';
+import { Types } from 'mongoose';
 
 export const OrderSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    riderId: { type: Types.ObjectId, ref: 'Rider', default: null },
     serviceType: { type: String, enum: ['food', 'laundry'], required: true },
     totalAmount: { type: Number, required: true },
     finalAmount: { type: Number, required: true }, // Final amount after discount and offers
@@ -17,7 +19,7 @@ export const OrderSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'in_progress', 'completed'],
+      enum: ['pending', 'confirmed'],
       default: 'pending',
     },
     orderNumber: { type: String, unique: true, default: 0 },
@@ -36,6 +38,7 @@ export const OrderSchema = new Schema(
 export interface Order extends Document {
   userId: string;
   orderNumber: string;
+  riderId?: string | null;
   serviceType: string;
   totalAmount: number;
   finalAmount: number;

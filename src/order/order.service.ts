@@ -12,6 +12,7 @@ import CustomError from 'src/common/providers/customer-error.service';
 import { User } from 'src/user/interface/user.interface';
 import * as dotenv from 'dotenv';
 import { throwException } from 'src/util/errorhandling';
+import { Rider } from 'src/rider/rider.schema/rider.schema';
 
 dotenv.config({ path: './.env' });
 
@@ -22,6 +23,7 @@ export class OrderService {
   constructor(
     @InjectModel('Order') private readonly orderModel: Model<Order>,
     @InjectModel('User') private readonly userModel: Model<User>,
+    @InjectModel('Rider') private readonly riderModel: Model<Rider>,
     @InjectModel('Subcategory')
     private readonly subcategoryModel: Model<Subcategory>,
   ) {
@@ -44,6 +46,7 @@ export class OrderService {
         specialOffer = 0,
         discount = 0,
         totalQuantity = 1,
+        riderId,
       } = createOrderDto;
 
       const subcategory = await this.subcategoryModel.findById(subCategoryId);
@@ -51,14 +54,15 @@ export class OrderService {
 
       const subCategoryPrice = subcategory.price;
       const totalAmount = subCategoryPrice * totalQuantity;
-
       const discountAmount = (totalAmount * discount) / 100;
       const specialOfferAmount = (totalAmount * specialOffer) / 100;
       const finalAmount = totalAmount - discountAmount - specialOfferAmount;
       const orderNumber = `${Math.floor(Math.random() * 10000)}`;
-      createOrderDto.orderNumber = orderNumber;
+
+      // ✅ Ensure `riderId` is valid
       const newOrder = new this.orderModel({
         orderNumber,
+        riderId: riderId ? riderId : null, // ✅ Ensure it's either an ObjectId or null
         userId,
         serviceType,
         address,
@@ -71,9 +75,13 @@ export class OrderService {
         status: 'pending',
       });
 
+      console.log('Saving Order:', newOrder); // ✅ Debugging
+
       const savedOrder = await newOrder.save();
+      console.log('Saved Order:', savedOrder); // ✅ Debugging
       return new CustomResponse(200, 'Order Created Successfully', savedOrder);
     } catch (error) {
+      console.error('Error in createOrder:', error);
       throwException(error);
     }
   }
@@ -121,10 +129,9 @@ export class OrderService {
     order.razorpayOrderId = razorpayOrder.id;
     await order.save();
     return new CustomResponse(200, 'Payment Order Created', {
-      razorpayOrder // Provide the payment link to the user
+      razorpayOrder, // Provide the payment link to the user
     });
   }
-
 
   async verifyPayment(body: any) {
     const { event, payload } = body;
@@ -142,7 +149,11 @@ export class OrderService {
       return new CustomResponse(400, 'Payment entity is missing');
     }
 
-    const { id: paymentId, razorpayOrderId, signature } = payload.payment.entity;
+    const {
+      id: paymentId,
+      razorpayOrderId,
+      signature,
+    } = payload.payment.entity;
 
     // Check if all required fields are present
     if (!paymentId || !razorpayOrderId || !signature) {
@@ -151,20 +162,20 @@ export class OrderService {
 
     // Log the extracted payment details
 
-
     try {
-
       const order = await this.orderModel.findOne({
-        razorpayOrderId: { $regex: new RegExp(`^${razorpayOrderId}$`, 'i') }
+        razorpayOrderId: { $regex: new RegExp(`^${razorpayOrderId}$`, 'i') },
       });
-
 
       if (!order) {
         throw new CustomError(404, 'Order not found');
       }
 
       // Generate the expected signature using HMAC
-      const expectedSignature = createHmac('sha256', process.env.RAZORPAY_KEY_SECRET as string)
+      const expectedSignature = createHmac(
+        'sha256',
+        process.env.RAZORPAY_KEY_SECRET as string,
+      )
         .update(razorpayOrderId + '|' + paymentId)
         .digest('hex');
 
@@ -182,14 +193,15 @@ export class OrderService {
 
       // Return success response
       return new CustomResponse(200, 'Payment verified successfully', order);
-
     } catch (error) {
       // Catch any errors and return a clear response
       console.error('Error verifying payment:', error);
-      return new CustomResponse(error.statusCode || 500, error.message || 'An error occurred while verifying payment');
+      return new CustomResponse(
+        error.statusCode || 500,
+        error.message || 'An error occurred while verifying payment',
+      );
     }
   }
-
 
   /**
    * ✅ Refund Payment
@@ -219,18 +231,37 @@ export class OrderService {
 
     return { message: 'Order deleted successfully' }; // Return success message
   }
-  async updateOrderStatus(orderId: string, status: string): Promise<Order> {
-    const allowedStatuses = ['pending', 'in_progress', 'completed'];
-    if (!allowedStatuses.includes(status)) {
-      throw new CustomError(400, 'Invalid status value');
+  async updateOrderStatus(
+    orderId: string,
+    updateBody: { status: string },
+  ): Promise<any> {
+    const { status } = updateBody;
+
+    if (!['pending', 'confirmed'].includes(status)) {
+      throw new CustomError(400, `Invalid status value: ${status}`);
     }
 
-    const order = await this.orderModel.findById(orderId);
+    // Find order and populate rider details
+    const order = await this.orderModel
+      .findById(orderId)
+      .populate({
+        path: 'riderId',
+        select: 'name phone vehicleNumber', // ✅ Select only necessary fields
+      })
+      .exec();
+
     if (!order) throw new CustomError(404, 'Order not found');
+
+    // if (!order) throw new CustomError(404, 'Order not found');
 
     order.status = status;
     await order.save();
-    return order;
+
+    // console.log('Updated Order:', order); // Debugging
+    return {
+      message: 'Order status updated successfully',
+      order,
+    };
   }
 
   async getOrderHistoryByUrserId(userId: string) {

@@ -9,6 +9,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
+import { stat } from 'fs';
+import { updateOrderDto } from './dto/update-order-dto';
 
 @Controller('orders')
 export class OrderController {
@@ -55,5 +57,13 @@ export class OrderController {
     @Body() paymentStatus: string,
   ) {
     return this.orderService.getPaymentStatus(id, paymentStatus);
+  }
+
+  @Put('orderStatus/:id')
+  async updateOrderStatus(
+    @Param('id') orderId: string,
+    @Body() body: updateOrderDto, // Use DTO for validation
+  ) {
+    return this.orderService.updateOrderStatus(orderId, body); // FIXED: Passing only status
   }
 }
