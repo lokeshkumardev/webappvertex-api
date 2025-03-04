@@ -50,8 +50,7 @@ export class AuthService {
           },
         );
         // await this.twilioService.sendOTP(userPhone, otp);
-        const response = await this.twilioService.sendOTP(userPhone, otp);
-        console.log('Twilio Response:', response);
+        await this.twilioService.sendOTP(userPhone, otp);
 
         return new CustomResponse(HttpStatus.OK, MESSAGE.OTP.SENT);
       }

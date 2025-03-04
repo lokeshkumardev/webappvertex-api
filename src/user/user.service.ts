@@ -45,12 +45,12 @@ export class UserService {
       }
 
       // Hash password before saving
-      const hashedPassword = await bcrypt.hash(createUserDto.userPassword, 10);
+      // const hashedPassword = await bcrypt.hash(createUserDto.userPassword, 10);
 
       // Create the new user with hashed password
       const newUser = new this.userModel({
         ...createUserDto,
-        userPassword: hashedPassword,
+        // userPassword: hashedPassword,
       });
 
       const user = await newUser.save();
