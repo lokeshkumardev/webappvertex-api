@@ -7,6 +7,7 @@ export const documentSchema = new Schema({
   aadharBack: { type: String, default: null },
   drivingLicenseFront: { type: String, default: null },
   drivingLicenseBack: { type: String, default: null },
+  status: { type: Boolean },
 });
 
 export interface RiderDocument extends MongooseDocument {
@@ -16,4 +17,5 @@ export interface RiderDocument extends MongooseDocument {
   aadharBack: string;
   drivingLicenseFront: string;
   drivingLicenseBack: string;
+  status: boolean;
 }

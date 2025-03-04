@@ -54,4 +54,6 @@ export class CreateRiderDto {
   @IsNotEmpty()
   @IsString()
   completeAddress: string;
+
+  status?: boolean;
 }
