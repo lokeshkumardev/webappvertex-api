@@ -8,13 +8,15 @@ import { SubcategoryModule } from 'src/category/subcategory/subcategory.module';
 import { RazorpayService } from 'src/razorpay/razorpay.service';
 import { RazorpayModule } from 'src/razorpay/razorpay.module';
 import { UserModule } from 'src/user/user.module';
+import { RiderModule } from 'src/rider/rider.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Order', schema: OrderSchema }]),
-    SubcategoryModule, // Add the SubcategoryModule here'
+    SubcategoryModule,
     RazorpayModule,
-    UserModule // Add the RazorpayService here
+    UserModule,
+    RiderModule, // ✅ Ensure RiderModule is imported
   ],
   providers: [OrderService],
   controllers: [OrderController],

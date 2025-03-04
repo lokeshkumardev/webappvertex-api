@@ -34,4 +34,6 @@ export class CreateOrderDto {
   @IsOptional()
   @IsNumber()
   totalQuantity?: number; // Default is 1
+
+  riderId?: string;
 }
