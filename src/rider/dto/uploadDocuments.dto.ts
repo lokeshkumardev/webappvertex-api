@@ -1,3 +1,4 @@
+import { BlobOptions } from 'buffer';
 import { IsOptional, IsString } from 'class-validator';
 
 export class UploadDocumentsDto {
@@ -20,4 +21,6 @@ export class UploadDocumentsDto {
   @IsOptional()
   @IsString()
   drivingLicenseBack?: string;
+
+  status?: boolean;
 }
