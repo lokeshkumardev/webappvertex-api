@@ -67,4 +67,9 @@ export class RiderController {
   async getDocuments(@Param('riderId') riderId: string) {
     return this.riderService.getDocuments(riderId);
   }
+
+  @Get(':riderId')
+  async getRider(@Param('riderId') riderId: string) {
+    return this.riderService.getRider(riderId);
+  }
 }
