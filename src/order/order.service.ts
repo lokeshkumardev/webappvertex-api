@@ -228,8 +228,7 @@ export class OrderService {
     // Find the order by ID and delete it
     const result = await this.orderModel.findByIdAndDelete(orderId);
     if (!result) throw new CustomError(404, 'Order not found');
-
-    return { message: 'Order deleted successfully' }; // Return success message
+    return new CustomResponse(200, 'Order deleted successfully', result);
   }
   async updateOrderStatus(
     orderId: string,

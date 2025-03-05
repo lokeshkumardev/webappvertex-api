@@ -14,7 +14,7 @@ export const RiderSchema = new Schema(
     language: { type: String, required: true },
     referralCode: { type: String },
     completeAddress: { type: String, required: true },
-    status: { type: Boolean, required: true },
+    status: { type: Boolean, required: true, default: false },
 
     // Profile Picture
     profilePicture: { type: String },

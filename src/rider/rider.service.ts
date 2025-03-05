@@ -143,11 +143,23 @@ export class RiderService {
     try {
       const rider = await this.documentModel.findOne({ riderId: riderId });
       if (!rider) {
-        throw new CustomError(404, 'Rider not found');
+        throw new CustomError(404, 'Rider Not Found');
       }
       return new CustomResponse(200, 'Documents retrieved successfully', rider);
     } catch (error) {
       throw new CustomError(500, error.message || 'Internal Server Error');
+    }
+  }
+
+  async getRider(riderId: string) {
+    try {
+      const rider = await this.riderModel.findById(riderId);
+      if (!rider) {
+        throw new CustomError(404, 'Rider Not Found');
+      }
+      return new CustomResponse(200, 'Rider Retrived Successfully', rider);
+    } catch (error) {
+      throw new CustomError(500, 'Internal Server Error');
     }
   }
 }
