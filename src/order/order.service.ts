@@ -258,10 +258,7 @@ export class OrderService {
     await order.save();
 
     // console.log('Updated Order:', order); // Debugging
-    return {
-      message: 'Order status updated successfully',
-      order,
-    };
+    return new CustomResponse(200, 'Order Status Updated Successfully', order);
   }
 
   async getOrderHistoryByUrserId(userId: string) {
