@@ -14,6 +14,13 @@ export class BankDetailService {
   ) {}
 
   async createBankDetail(createBankDetailDto: CreateBankDetailDto) {
+    const existingBankDetail = await this.bankDetailModel.findOne({
+      accountNumber: createBankDetailDto.accountNumber,
+    });
+
+    if (existingBankDetail) {
+      throw new CustomError(403, 'Account number already exists');
+    }
     const newBankDetail = new this.bankDetailModel(createBankDetailDto);
     const bankDetail = await newBankDetail.save();
     return new CustomResponse(
