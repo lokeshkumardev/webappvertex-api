@@ -1,10 +1,10 @@
 import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
-import { StringExpression } from 'mongoose';
 
 export class CreateOrderDto {
   orderNumber: string;
-  // @IsString()
-  // @IsNotEmpty()
+
+  @IsString()
+  @IsNotEmpty()
   userId: string;
 
   @IsString()
@@ -15,13 +15,9 @@ export class CreateOrderDto {
   @IsNotEmpty()
   address: string;
 
-  // @IsString()
-  // @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   subCategoryId: string; // This references the Subcategory
-
-  // @IsString()
-  // @IsNotEmpty()
-  // amount: string;
 
   @IsOptional()
   @IsNumber()
@@ -35,5 +31,16 @@ export class CreateOrderDto {
   @IsNumber()
   totalQuantity?: number; // Default is 1
 
+  @IsOptional()
+  @IsString()
   riderId?: string;
+
+  // ✅ Add user location properties
+  @IsNotEmpty()
+  @IsNumber()
+  userLongitude: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  userLatitude: number;
 }

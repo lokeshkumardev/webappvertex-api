@@ -20,43 +20,33 @@ export class UserService {
 
   constructor(@InjectModel('User') private userModel: Model<User>) {}
 
-  async create(createUserDto: CreateUserDto) {
-    // console.log('hiii', this.userModel);
-    // Check if user email already exists
+  async updateLocation(
+    userId: string,
+    longitude: number,
+    latitude: number,
+    address?: string,
+  ) {
     try {
-      if (!createUserDto.userEmail) {
-        throw new CustomResponse(409, 'Email Field Is Requrired');
-      }
-      if (!createUserDto.userPassword) {
-      } else {
-        const userPhone = await this.userModel.findOne({
-          userPhone: createUserDto.userPhone,
-        });
-        if (userPhone) {
-          throw new CustomResponse(403, 'userPhone Already Exits');
-        }
+      const user = await this.userModel.findById(userId);
+
+      if (!user) {
+        throw new CustomResponse(404, 'User not found');
       }
 
-      const existingUser = await this.userModel.findOne({
-        userEmail: createUserDto.userEmail,
-      });
-      if (existingUser) {
-        throw new CustomResponse(403, 'User with this email already exists');
+      // ✅ Location update karein
+      user.location = {
+        type: 'Point',
+        coordinates: [longitude, latitude],
+      };
+
+      // ✅ Agar address aaya hai toh update karein
+      if (address) {
+        user.userAddress = address;
       }
 
-      // Hash password before saving
-      // const hashedPassword = await bcrypt.hash(createUserDto.userPassword, 10);
-
-      // Create the new user with hashed password
-      const newUser = new this.userModel({
-        ...createUserDto,
-        // userPassword: hashedPassword,
-      });
-
-      const user = await newUser.save();
-      return new CustomResponse(200, 'success', user);
+      await user.save();
+      return new CustomResponse(200, 'Location updated successfully', user);
     } catch (error) {
-      // console.log('error', error);
       throwException(error);
     }
   }
@@ -101,4 +91,32 @@ export class UserService {
   // }
 
   // Other user CRUD operations (create, update, delete, etc.)
+  async findNearbyUsers(
+    longitude: number,
+    latitude: number,
+    maxDistance = 5000,
+  ) {
+    try {
+      const users = await this.userModel.find({
+        location: {
+          $near: {
+            $geometry: { type: 'Point', coordinates: [longitude, latitude] },
+            $maxDistance: maxDistance, // Default: 5 KM
+          },
+        },
+      });
+
+      if (!users.length) {
+        return new CustomResponse(404, 'No Users Found Nearby');
+      }
+
+      return new CustomResponse(
+        200,
+        'Nearby Users Retrieved Successfully',
+        users,
+      );
+    } catch (error) {
+      throw new CustomError(500, error.message || 'Internal Server Error');
+    }
+  }
 }

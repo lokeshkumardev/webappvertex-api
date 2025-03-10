@@ -8,6 +8,7 @@ import CustomResponse from 'src/common/providers/custom-response.service';
 import { User } from 'src/user/interface/user.interface';
 import CustomError from 'src/common/providers/customer-error.service';
 import { RiderDocument } from './rider.schema/document.schema';
+import { UpdateRiderStatusDto } from './dto/update-rider-status.dto';
 
 @Injectable()
 export class RiderService {
@@ -22,25 +23,34 @@ export class RiderService {
     profileImage?: Express.Multer.File,
   ) {
     try {
+      // ✅ Profile picture upload
       if (profileImage) {
         const uploadedFileName = fileUpload('profile_pictures', profileImage);
         createRiderDto.profilePicture = `${process.env.SERVER_BASE_URL}/uploads/profile_pictures/${uploadedFileName}`;
       }
 
-      const newRider = new this.riderModel({
-        ...createRiderDto,
-      });
-
+      // ✅ Check if Rider already exists
       const existingRider = await this.riderModel.findOne({
         primaryMobileNumber: createRiderDto.primaryMobileNumber,
       });
-      if (existingRider) {
-        return new CustomResponse(403, 'Rider Already Exits !');
-      }
-      const rider = await newRider.save();
 
+      if (existingRider) {
+        return new CustomResponse(403, 'Rider Already Exists!');
+      }
+
+      // ✅ Create Rider with GeoJSON Location
+      const newRider = new this.riderModel({
+        ...createRiderDto,
+        riderLocation: {
+          type: 'Point',
+          coordinates: [createRiderDto.longitude, createRiderDto.latitude], // Longitude, Latitude
+        },
+      });
+
+      const rider = await newRider.save();
       return new CustomResponse(200, 'Rider Successfully Created', rider);
     } catch (error) {
+      console.error(error);
       throw new CustomError(500, 'Internal Server Error');
     }
   }
@@ -160,6 +170,32 @@ export class RiderService {
       return new CustomResponse(200, 'Rider Retrived Successfully', rider);
     } catch (error) {
       throw new CustomError(500, 'Internal Server Error');
+    }
+  }
+
+  async updateRider(
+    riderId: string,
+    updateRiderStatus: any,
+    profileImage?: Express.Multer.File,
+  ) {
+    try {
+      if (profileImage) {
+        const uploadedFileName = fileUpload('profile_pictures', profileImage);
+        updateRiderStatus.profilePicture = `${process.env.SERVER_BASE_URL}/uploads/profile_pictures/${uploadedFileName}`;
+      }
+      const rider = await this.riderModel.findByIdAndUpdate(
+        riderId,
+        { $set: updateRiderStatus }, // Ensure DTO is correctly structured
+        { new: true, runValidators: true },
+      );
+
+      if (!rider) {
+        throw new CustomError(404, 'Rider Not Found');
+      }
+
+      return new CustomResponse(200, 'Rider Updated Successfully', rider);
+    } catch (error) {
+      throw new CustomError(500, error.message || 'Internal Server Error');
     }
   }
 }

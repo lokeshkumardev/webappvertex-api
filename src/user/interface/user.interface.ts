@@ -14,4 +14,8 @@ export interface User extends Document {
   otp: string;
   otpExpiration: Date; // Assuming password will be a string
   role: 'user' | 'admin';
+  location: {
+    type: 'Point';
+    coordinates: [number, number];
+  };
 }

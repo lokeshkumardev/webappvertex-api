@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Get, Put } from '@nestjs/common';
+import { Body, Controller, Param, Post, Get, Put, Query } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service'; // Import AuthService to use OTP functionality
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -12,9 +12,25 @@ export class UserController {
     private readonly authService: AuthService, // Inject AuthService for OTP handling
   ) {}
 
-  @Post('create-user')
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @Put('update-location/:id')
+  async updateLocation(
+    @Param('id') userId: string,
+    @Body() body: { longitude: number; latitude: number; address: string },
+  ) {
+    return this.userService.updateLocation(
+      userId,
+      body.longitude,
+      body.latitude,
+      body.address,
+    ); // ✅ Corrected
+  }
+
+  @Get('nearby-users')
+  async getNearbyUsers(
+    @Query('longitude') longitude: number,
+    @Query('latitude') latitude: number,
+  ) {
+    return this.userService.findNearbyUsers(longitude, latitude);
   }
 
   // Other user CRUD operations (create, update, delete, etc.) remain unchanged
