@@ -5,6 +5,8 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
+  Max,
+  Min,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 
@@ -15,7 +17,7 @@ export class CreateUserDto {
 
   userEmail: string;
 
-  userAddress: string;
+  address: string;
   // @IsString()
   userPhone: string;
 
@@ -28,4 +30,15 @@ export class CreateUserDto {
   userPassword: string;
   role: 'user' | 'admin';
   otpExpiration: { type: Date };
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  longitude: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  latitude: number;
 }

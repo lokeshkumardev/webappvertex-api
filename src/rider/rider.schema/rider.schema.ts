@@ -16,18 +16,36 @@ export const RiderSchema = new Schema(
     completeAddress: { type: String, required: true },
     status: { type: Boolean, required: true, default: false },
 
-    // Profile Picture
+    // ✅ Profile Picture
     profilePicture: { type: String },
 
+    // ✅ User Type
     userType: {
       type: String,
       required: true,
       enum: ['rider'],
       default: 'rider',
     },
+
+    // ✅ Rider Location (GeoJSON)
+    riderLocation: {
+      type: {
+        type: String,
+        enum: ['Point'], // GeoJSON type
+        required: true,
+        default: 'Point',
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+      },
+    },
   },
   { timestamps: true },
 );
+
+// ✅ Add Geo Index for location-based queries
+RiderSchema.index({ riderLocation: '2dsphere' });
 
 export interface Rider extends Document {
   firstName: string;
@@ -44,4 +62,11 @@ export interface Rider extends Document {
   completeAddress: string;
   profilePicture?: string;
   status: boolean;
+  userType: string;
+
+  // ✅ Add location property
+  riderLocation: {
+    type: 'Point';
+    coordinates: [number, number]; // [longitude, latitude]
+  };
 }

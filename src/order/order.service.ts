@@ -46,6 +46,8 @@ export class OrderService {
         specialOffer = 0,
         discount = 0,
         totalQuantity = 1,
+        userLongitude,
+        userLatitude,
         riderId,
       } = createOrderDto;
 
@@ -59,10 +61,28 @@ export class OrderService {
       const finalAmount = totalAmount - discountAmount - specialOfferAmount;
       const orderNumber = `${Math.floor(Math.random() * 10000)}`;
 
+      // ✅ Find nearby riders within 5km
+      const userLocation = [userLongitude, userLatitude];
+      const nearbyRiders = await this.riderModel
+        .find({
+          riderLocation: {
+            $near: {
+              $geometry: {
+                type: 'Point',
+                coordinates: userLocation,
+              },
+              $maxDistance: 5000, // 5km radius
+            },
+          },
+        })
+        .limit(1);
+
+      const assignedRider = nearbyRiders.length ? nearbyRiders[0]._id : null;
+
       // ✅ Ensure `riderId` is valid
       const newOrder = new this.orderModel({
         orderNumber,
-        riderId: riderId ? riderId : null, // ✅ Ensure it's either an ObjectId or null
+        riderId: assignedRider, // ✅ Ensure it's either an ObjectId or null
         userId,
         serviceType,
         address,
@@ -72,6 +92,10 @@ export class OrderService {
         specialOffer,
         discount,
         subCategoryId,
+        userLocation: {
+          type: 'Point',
+          coordinates: userLocation,
+        },
         status: 'pending',
       });
 

@@ -11,6 +11,8 @@ import {
 import { RiderService } from './rider.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { UpdateRiderStatusDto } from './dto/update-rider-status.dto';
+import { UpdateRiderDto } from './dto/updateRider.dto';
 
 @Controller('riders')
 export class RiderController {
@@ -71,5 +73,21 @@ export class RiderController {
   @Get(':riderId')
   async getRider(@Param('riderId') riderId: string) {
     return this.riderService.getRider(riderId);
+  }
+
+  @Put(':riderId')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'profilePicture', maxCount: 1 }]),
+  )
+  async updateRider(
+    @Param('riderId') riderId: string,
+    @Body() updateRiderStatus: UpdateRiderDto,
+    @UploadedFiles() files: { profilePicture?: Express.Multer.File[] },
+  ) {
+    return this.riderService.updateRider(
+      riderId,
+      updateRiderStatus,
+      files?.profilePicture?.[0],
+    );
   }
 }

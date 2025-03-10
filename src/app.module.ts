@@ -27,6 +27,9 @@ import { StoreModule } from './store/store.module';
 import { NotificationModule } from './notification/notification.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { BankDetailModule } from './bank-details/bank-details.module';
+import { RiderWalletModule } from './rider-wallet/rider-wallet.module';
+import { RiderTransactionService } from './rider-transaction/rider-transaction.service';
+import { RiderTransactionModule } from './rider-transaction/rider-transaction.module';
 
 dotenv.config({ path: './.env' });
 @Module({
@@ -56,8 +59,10 @@ dotenv.config({ path: './.env' });
     NotificationModule,
     DashboardModule,
     BankDetailModule,
+    RiderTransactionModule,
+    RiderWalletModule,
   ],
   controllers: [AppController, StoreController],
-  providers: [AppService, RazorpayService],
+  providers: [AppService, RazorpayService, RiderTransactionService],
 })
 export class AppModule {}
