@@ -22,13 +22,12 @@ export class UserService {
 
   async updateLocation(
     userId: string,
-    longitude: number,
-    latitude: number,
+    longitude: string,
+    latitude: string,
     address?: string,
   ) {
     try {
       const user = await this.userModel.findById(userId);
-
       if (!user) {
         throw new CustomResponse(404, 'User not found');
       }
@@ -92,15 +91,18 @@ export class UserService {
 
   // Other user CRUD operations (create, update, delete, etc.)
   async findNearbyUsers(
-    longitude: number,
-    latitude: number,
+    longitude: string,
+    latitude: string,
     maxDistance = 5000,
   ) {
     try {
       const users = await this.userModel.find({
         location: {
           $near: {
-            $geometry: { type: 'Point', coordinates: [longitude, latitude] },
+            $geometry: {
+              type: 'Point',
+              coordinates: [(Number(longitude), Number(latitude))],
+            },
             $maxDistance: maxDistance, // Default: 5 KM
           },
         },

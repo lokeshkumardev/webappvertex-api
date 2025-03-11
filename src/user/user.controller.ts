@@ -15,7 +15,7 @@ export class UserController {
   @Put('update-location/:id')
   async updateLocation(
     @Param('id') userId: string,
-    @Body() body: { longitude: number; latitude: number; address: string },
+    @Body() body: { longitude: string; latitude: string; address: string },
   ) {
     return this.userService.updateLocation(
       userId,
@@ -27,8 +27,8 @@ export class UserController {
 
   @Get('nearby-users')
   async getNearbyUsers(
-    @Query('longitude') longitude: number,
-    @Query('latitude') latitude: number,
+    @Query('longitude') longitude: string,
+    @Query('latitude') latitude: string,
   ) {
     return this.userService.findNearbyUsers(longitude, latitude);
   }

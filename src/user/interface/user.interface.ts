@@ -16,6 +16,6 @@ export interface User extends Document {
   role: 'user' | 'admin';
   location: {
     type: 'Point';
-    coordinates: [number, number];
+    coordinates: [string, string];
   };
 }
