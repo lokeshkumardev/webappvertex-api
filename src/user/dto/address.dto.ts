@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsMongoId } from 'class-validator';
 
 export class AddressDto {
   @IsNotEmpty()
@@ -26,6 +26,7 @@ export class AddressDto {
   longitude: string;
 
   @IsNotEmpty()
-  @IsString()
+  // @IsString()
+  @IsMongoId()
   userId: string;
 }
