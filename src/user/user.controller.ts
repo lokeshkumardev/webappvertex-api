@@ -4,6 +4,9 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './interface/user.interface';
 import { ROUTE } from 'src/util/constants';
+import { create } from 'domain';
+import { AddressDto } from './dto/address.dto';
+import { Address } from './user.schema/address.schema';
 
 @Controller(ROUTE.USER)
 export class UserController {
@@ -11,6 +14,17 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService, // Inject AuthService for OTP handling
   ) {}
+
+  @Post('create-address')
+  async createAddress(@Body() dto: AddressDto) {
+    return this.userService.createAddress(dto); // ✅ Corrected: Service method call
+  }
+
+  @Get('address/:userId')
+  async getAddress(@Param('userId') userId: string) {
+    // console.log('Received userId:', userId); // Debugging
+    return this.userService.getAddress(userId);
+  }
 
   @Put('update-location/:id')
   async updateLocation(
@@ -40,12 +54,14 @@ export class UserController {
     return this.userService.findUserById(userId);
   }
 
-  @Put('updateUser/:id')
+  @Put('updateUser/:userId/:id')
   async updateUser(
-    @Param('id') userId: string,
-    @Body() updateData: CreateUserDto,
+    @Param('userId') userId: string,
+    @Param('id') id: string,
+    @Body() updateData: AddressDto,
+    // CreateUserDto:CreateUserDto
   ) {
-    return this.userService.updateUserByUserId(userId, updateData);
+    return this.userService.updateUserByUserId(userId, id, updateData);
   }
   // @Get('getAdminbyUserName/:username')
   // async findAdminByUsername(@Param('username') username: string) {

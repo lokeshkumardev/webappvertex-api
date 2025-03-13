@@ -12,14 +12,59 @@ import * as bcrypt from 'bcryptjs';
 import CustomResponse from 'src/common/providers/custom-response.service';
 import { throwException } from 'src/util/errorhandling';
 import CustomError from 'src/common/providers/customer-error.service';
+import { AddressDto } from './dto/address.dto';
+import { Address } from './user.schema/address.schema';
 
 @Injectable()
 export class UserService {
   private twilioClient: any;
   private otpStore: { [key: string]: string } = {}; // Temporary in-memory store for OTPs
 
-  constructor(@InjectModel('User') private userModel: Model<User>) {}
+  constructor(
+    @InjectModel('User') private userModel: Model<User>,
+    @InjectModel('Address') private addressModel: Model<Address>, // ✅ Add this
+  ) {}
 
+  async createAddress(dto: AddressDto) {
+    try {
+      const address = new this.addressModel({
+        address: dto.address,
+        userName: dto.userName,
+        alternatePhone: dto.alternatePhone,
+        landmark: dto.landmark,
+        location: {
+          type: 'Point',
+          coordinates: [dto.longitude, dto.latitude], // ✅ Ensure Correct Order
+        },
+        userId: dto.userId,
+      });
+
+      const saveAddress = await address.save();
+
+      return new CustomResponse(
+        200,
+        'Address Created Successfully',
+        saveAddress,
+      );
+    } catch (error) {
+      console.error('Error saving address:', error);
+      throwException(error);
+    }
+  }
+
+  async getAddress(userId: string) {
+    try {
+      // console.log('Service received userId:', userId); // Debugging
+      const user = await this.addressModel.find({ userId }).exec();
+      // console.log('Queried User:', user); // Debugging
+      if (!user) {
+        return new CustomError(404, 'Address Not Found');
+      }
+      return new CustomResponse(200, 'Address Found Successfully', user);
+    } catch (error) {
+      throwException(error);
+    }
+  }
   async updateLocation(
     userId: string,
     longitude: string,
@@ -50,12 +95,22 @@ export class UserService {
     }
   }
 
-  async updateUserByUserId(userId: string, updateData: Partial<CreateUserDto>) {
+  async updateUserByUserId(
+    userId: string,
+    id: string,
+    updateData: Partial<CreateUserDto>,
+  ) {
+    // CreateUserDto:CreateUserDto
     try {
-      const user = await this.userModel.findById(userId).exec();
+      const user = await this.userModel.findById(userId, id).exec();
       if (!user) {
         throw new CustomResponse(404, 'User not found');
       }
+
+      // const email = await this.userModel.findOne({ CreateUserDto.userEmail }).exec();
+      // if (email) {
+      //   throw new CustomResponse(400, 'Email already exists');
+      // }
 
       const updatedUser = await this.userModel
         .findByIdAndUpdate(userId, updateData, {
