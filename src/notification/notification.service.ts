@@ -12,7 +12,12 @@ export class NotificationService implements OnModuleInit {
     });
   }
 
-  async sendNotification(token: string, title: string, body: string, data?: any) {
+  async sendNotification(
+    token: string,
+    title: string,
+    body: string,
+    data?: any,
+  ) {
     const message = {
       notification: {
         title,
@@ -21,10 +26,11 @@ export class NotificationService implements OnModuleInit {
       token,
       data,
     };
+    // console.log('message', message);
 
     try {
       const response = await admin.messaging().send(message);
-      return new CustomResponse(200,'Successfully sent message:',response)
+      return new CustomResponse(200, 'Successfully sent message:', response);
     } catch (error) {
       throwException(error);
     }

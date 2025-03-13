@@ -14,21 +14,29 @@ export class TransactionService {
     @InjectModel(Wallet.name) private walletModel: Model<Wallet>, // Inject Wallet model
   ) {}
 
-  async createTransaction(createTransactionDto: CreateTransactionDto): Promise<any> {
+  async createTransaction(
+    createTransactionDto: CreateTransactionDto,
+  ): Promise<any> {
     try {
       if (createTransactionDto.amount <= 0) {
-        throw new CustomResponse(400, "Transaction amount must be greater than zero");
+        throw new CustomResponse(
+          400,
+          'Transaction amount must be greater than zero',
+        );
       }
       // console.log('hiiiiiiii')
-      if (!createTransactionDto.userId || !createTransactionDto.amount || !createTransactionDto.type) {
+      if (
+        !createTransactionDto.userId ||
+        !createTransactionDto.amount ||
+        !createTransactionDto.type
+      ) {
         throw new CustomResponse(400, 'Invalid transaction data');
       }
-      
-     
 
-      
       // Fetch the user's wallet
-      const wallet = await this.walletModel.findOne({ userId: createTransactionDto.userId });
+      const wallet = await this.walletModel.findOne({
+        userId: createTransactionDto.userId,
+      });
       if (!wallet) {
         throw new CustomResponse(404, 'Wallet not found for this user');
       }
@@ -49,8 +57,13 @@ export class TransactionService {
       await wallet.save();
 
       // Create the transaction record
-      const transaction = await this.transactionModel.create(createTransactionDto);
-      return new CustomResponse(200, 'Transaction created successfully', transaction);
+      const transaction =
+        await this.transactionModel.create(createTransactionDto);
+      return new CustomResponse(
+        200,
+        'Transaction created successfully',
+        transaction,
+      );
     } catch (error) {
       throwException(error);
     }
@@ -62,12 +75,18 @@ export class TransactionService {
         throw new CustomResponse(400, 'User ID is required');
       }
 
-      const transactions = await this.transactionModel.find({ userId }).sort({ createdAt: -1 });
+      const transactions = await this.transactionModel
+        .find({ userId })
+        .sort({ createdAt: -1 });
       if (!transactions.length) {
         throw new CustomResponse(404, 'No transactions found for this user');
       }
 
-      return new CustomResponse(200, 'Transaction history retrieved successfully', transactions);
+      return new CustomResponse(
+        200,
+        'Transaction history retrieved successfully',
+        transactions,
+      );
     } catch (error) {
       throwException(error);
     }
