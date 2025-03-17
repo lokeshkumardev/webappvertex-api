@@ -18,11 +18,11 @@ export class AddressDto {
   landmark: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsString()
   latitude: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsString()
   longitude: string;
 
   @IsNotEmpty()

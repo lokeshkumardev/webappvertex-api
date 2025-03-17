@@ -10,9 +10,9 @@ export class Address extends Document {
 
   @Prop({
     type: { type: String, enum: ['Point'], default: 'Point' },
-    coordinates: { type: [Number], required: true },
+    coordinates: { type: [String], required: true },
   })
-  location: { type: string; coordinates: number[] };
+  location: { type: string; coordinates: string[] };
 
   @Prop({ required: true }) userId: string;
 }

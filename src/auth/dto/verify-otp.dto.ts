@@ -6,4 +6,5 @@ export class VerifyOtpDto {
 
   @IsString()
   otp: string;
+  fcmToken;
 }
