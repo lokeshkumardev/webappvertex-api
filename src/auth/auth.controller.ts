@@ -18,8 +18,8 @@ export class AuthController {
 
   // Verify OTP
   @Post('verify-otp')
-  async verifyOTP(@Body() createUserDto: VerifyOtpDto) {
-    return this.authService.verifyOTP(createUserDto); // OTP verification
+  async verifyOTP(@Body() createUserDto: VerifyOtpDto, fcmToken: string) {
+    return this.authService.verifyOTP(createUserDto, fcmToken); // OTP verification
   }
 
   @Post('resend-otp')

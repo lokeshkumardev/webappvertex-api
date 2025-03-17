@@ -99,10 +99,10 @@ export class OrderService {
         status: 'pending',
       });
 
-      console.log('Saving Order:', newOrder); // ✅ Debugging
+      // console.log('Saving Order:', newOrder); // ✅ Debugging
 
       const savedOrder = await newOrder.save();
-      console.log('Saved Order:', savedOrder); // ✅ Debugging
+      // console.log('Saved Order:', savedOrder); // ✅ Debugging
       return new CustomResponse(200, 'Order Created Successfully', savedOrder);
     } catch (error) {
       console.error('Error in createOrder:', error);
