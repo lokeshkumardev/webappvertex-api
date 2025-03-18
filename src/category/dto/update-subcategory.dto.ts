@@ -34,6 +34,14 @@ export class UpdateSubcategoryDto {
   metaTitle: string;
 
   @IsOptional()
+  // @IsString()
+  laundryItems?: {
+    itemName: string;
+    count: string;
+    price: string;
+  }[];
+
+  @IsOptional()
   @IsString()
   metaDescription?: string;
 

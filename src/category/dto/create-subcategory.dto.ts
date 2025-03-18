@@ -1,5 +1,12 @@
 // src/dto/subcategory.dto.ts
+import { IsArray, IsOptional, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
+class LaundryItemDTO {
+  itemName: string;
+  count: number;
+  price: number;
+}
 export class CreateSubcategoryDTO {
   name: string;
   description: string;
@@ -18,7 +25,11 @@ export class CreateSubcategoryDTO {
   meta_title?: string;
   meta_description?: string;
   is_published?: boolean;
-  serviceType?: string
+  serviceType?: string;
+
+  @IsOptional()
+  @Type(() => LaundryItemDTO) // 👈 Ensure proper transformation
+  laundryItems?: LaundryItemDTO[];
 }
 
 export class UpdateSubcategoryDTO {
@@ -33,11 +44,17 @@ export class UpdateSubcategoryDTO {
     roti: string;
     price: string;
   }[];
+
+  laundryItems?: {
+    itemName: string;
+    count: string;
+    price: string;
+  }[];
   offer?: string;
   categoryId: string;
   userType?: 'daily' | 'permanent';
   meta_title?: string;
   meta_description?: string;
   is_published?: boolean;
-  categoryType?: string
+  categoryType?: string;
 }
