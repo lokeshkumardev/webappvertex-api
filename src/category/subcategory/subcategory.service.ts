@@ -31,7 +31,8 @@ export class SubcategoryService {
       if (!createSubcategoryDto) {
         throw new NotFoundException(400, 'Missing required fields');
       }
-
+      // console.log(createSubcategoryDto.laundryItems);
+      // ✅ Parse ExtraMeal if it's a string
       if (createSubcategoryDto.ExtraMeal) {
         try {
           if (typeof createSubcategoryDto.ExtraMeal === 'string') {
@@ -39,37 +40,72 @@ export class SubcategoryService {
               createSubcategoryDto.ExtraMeal,
             );
           }
-
           if (!Array.isArray(createSubcategoryDto.ExtraMeal)) {
             throw new CustomError(
               501,
               'Invalid ExtraMeal format, must be an array',
             );
           }
-
-          let totalPrice = createSubcategoryDto.price
-            ? Number(createSubcategoryDto.price)
-            : 0;
-
-          createSubcategoryDto.ExtraMeal.forEach((item) => {
-            const rotiCount = Number(item.roti); // Convert roti count to number
-            const rotiPrice = Number(item.price); // Price of one roti
-
-            if (isNaN(rotiCount) || isNaN(rotiPrice)) {
-              throw new CustomError(
-                501,
-                'Invalid roti or price value in ExtraMeal',
-              );
-            }
-
-            totalPrice += rotiCount * rotiPrice; // Multiply and add to total price
-          });
-
-          createSubcategoryDto.price = totalPrice;
         } catch (error) {
           throw new CustomError(501, 'Invalid JSON format for ExtraMeal');
         }
       }
+
+      // ✅ Parse laundryItems if it's a string
+      if (createSubcategoryDto.laundryItems) {
+        try {
+          if (typeof createSubcategoryDto.laundryItems === 'string') {
+            createSubcategoryDto.laundryItems = JSON.parse(
+              createSubcategoryDto.laundryItems,
+            );
+          }
+          if (!Array.isArray(createSubcategoryDto.laundryItems)) {
+            throw new CustomError(
+              501,
+              'Invalid laundryItems format, must be an array',
+            );
+          }
+        } catch (error) {
+          throw new CustomError(501, 'Invalid JSON format for laundryItems');
+        }
+      }
+
+      // ✅ Calculate total price from ExtraMeal & laundryItems
+      let totalPrice = createSubcategoryDto.price
+        ? Number(createSubcategoryDto.price)
+        : 0;
+
+      // 🥘 ExtraMeal Price Calculation
+      if (createSubcategoryDto.ExtraMeal) {
+        createSubcategoryDto.ExtraMeal.forEach((item) => {
+          const rotiCount = Number(item.roti);
+          const rotiPrice = Number(item.price);
+          if (isNaN(rotiCount) || isNaN(rotiPrice)) {
+            throw new CustomError(
+              501,
+              'Invalid roti or price value in ExtraMeal',
+            );
+          }
+          totalPrice += rotiCount * rotiPrice;
+        });
+      }
+
+      // 👕 Laundry Items Price Calculation
+      if (createSubcategoryDto.laundryItems) {
+        createSubcategoryDto.laundryItems.forEach((item) => {
+          const itemCount = Number(item.count);
+          const itemPrice = Number(item.price);
+          if (isNaN(itemCount) || isNaN(itemPrice)) {
+            throw new CustomError(
+              501,
+              'Invalid count or price value in laundryItems',
+            );
+          }
+          totalPrice += itemCount * itemPrice;
+        });
+      }
+
+      createSubcategoryDto.price = totalPrice;
 
       // ✅ Handle File Uploads
       const webImageFile = files.find((file) => file.fieldname === 'web_image');
@@ -89,9 +125,6 @@ export class SubcategoryService {
             `${process.env.SERVER_BASE_URL}uploads/subcategory/appImage/${appImage}`,
           ]
         : [];
-
-      // // ✅ Add parsed ExtraMeal to DTO
-      // createSubcategoryDto.ExtraMeal = createSubcategoryDto.ExtraMeal;
 
       // ✅ Save to Database
       const subcategory = new this.subcategoryModel(createSubcategoryDto);

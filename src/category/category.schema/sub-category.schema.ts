@@ -24,6 +24,18 @@ export class Subcategory {
   @Prop()
   price: number;
 
+  @Prop({
+    type: [
+      {
+        itemName: String,
+        count: String,
+        price: String,
+      },
+    ],
+    default: [],
+  })
+  laundryItems?: { itemName: string; count: string; price: string }[];
+
   @Prop()
   rating: number;
 
