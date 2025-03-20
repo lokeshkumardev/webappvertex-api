@@ -35,12 +35,12 @@ export class CreateOrderDto {
   @IsString()
   riderId?: string;
 
-  // ✅ Add user location properties
+  // ✅ Store as string
   @IsNotEmpty()
-  @IsNumber()
-  userLongitude: number;
+  @IsString()
+  userLongitude: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  userLatitude: number;
+  @IsString()
+  userLatitude: string;
 }

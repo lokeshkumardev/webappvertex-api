@@ -26,16 +26,15 @@ export const OrderSchema = new Schema(
       default: 'pending',
     },
 
-    // ✅ User Location (Proper GeoJSON Format)
     userLocation: {
       type: {
         type: String,
-        enum: ['Point'], // Ensure type is always "Point"
+        enum: ['Point'],
         default: 'Point',
       },
       coordinates: {
-        type: [Number],
-        required: true, // Ensure it's always provided
+        type: [Number], // ✅ Store as numbers
+        required: true,
       },
     },
 
@@ -76,6 +75,6 @@ export interface Order extends Document {
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
   userLocation: {
     type: 'Point';
-    coordinates: [number, number]; // Ensure it's always [longitude, latitude]
+    coordinates: [string, string]; // Ensure it's always [longitude, latitude]
   };
 }
