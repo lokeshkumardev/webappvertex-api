@@ -138,27 +138,27 @@ export class OrderService {
    */
   async createPayment(orderId: string, amount: any) {
     try {
-      const order = await this.orderModel.findById(orderId);
+      const order = await this.orderModel.findById(orderId).lean(); // ✅ `lean()` se object immutable ho jata hai
       if (!order) throw new CustomError(404, 'Order not found');
 
-      // Create Razorpay payment order
       const razorpayOrder = await this.razorpayInstance.orders.create({
-        amount: amount * 100,
+        amount: amount,
         currency: 'INR',
         receipt: `ORD-${order._id}`,
         payment_capture: true,
       });
 
-      // Save the Razorpay order ID in the database
-      order.razorpayOrderId = razorpayOrder.id;
-      await order.save();
+      // ✅ `userLocation` untouched rakho
+      await this.orderModel.findByIdAndUpdate(orderId, {
+        $set: { razorpayOrderId: razorpayOrder.id }, // ✅ Sirf Razorpay Order ID update ho rahi hai
+      });
+
       return new CustomResponse(200, 'Payment Order Created', {
-        razorpayOrder, // Provide the payment link to the user
+        razorpayOrder,
       });
     } catch (error) {
       throw new CustomError(500, 'Error creating payment order');
     }
-    // console.log('amount', amount);
   }
 
   async verifyPayment(body: any) {
