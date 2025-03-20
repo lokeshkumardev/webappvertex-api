@@ -1,15 +1,5 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Param,
-  Put,
-  Patch,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { stat } from 'fs';
 import { updateOrderDto } from './dto/update-order-dto';
 
 @Controller('orders')
@@ -31,7 +21,7 @@ export class OrderController {
     return this.orderService.getOrderById(orderId);
   }
 
-  @Post(':id/payment')
+  @Post('payment/:id')
   async createPayment(@Param('id') orderId: string, @Body() amount: any) {
     return this.orderService.createPayment(orderId, amount.amount);
   }
@@ -51,12 +41,15 @@ export class OrderController {
     return this.orderService.refundPayment(orderId);
   }
 
-  @Put('paytmentStatus/:id')
+  @Put('paymentStatus/:id')
   async checkPaymentStatus(
-    @Param('id') id: string,
-    @Body() paymentStatus: string,
+    @Param('id') razorpayPaymentId: string,
+    @Body() body: { paymentStatus: string }, // ✅ Correct Body Structure
   ) {
-    return this.orderService.getPaymentStatus(id, paymentStatus);
+    return this.orderService.getPaymentStatus(
+      razorpayPaymentId,
+      body.paymentStatus,
+    );
   }
 
   @Put('orderStatus/:id')

@@ -62,7 +62,7 @@ export class OrderService {
       const orderNumber = `${Math.floor(Math.random() * 10000)}`;
 
       // ✅ Find nearby riders within 5km
-      const userLocation = [userLongitude, userLatitude];
+      const userLocation = [Number(userLongitude), Number(userLatitude)];
       const nearbyRiders = await this.riderModel
         .find({
           riderLocation: {
@@ -137,24 +137,28 @@ export class OrderService {
    * ✅ Create Razorpay Payment Order
    */
   async createPayment(orderId: string, amount: any) {
+    try {
+      const order = await this.orderModel.findById(orderId);
+      if (!order) throw new CustomError(404, 'Order not found');
+
+      // Create Razorpay payment order
+      const razorpayOrder = await this.razorpayInstance.orders.create({
+        amount: amount * 100,
+        currency: 'INR',
+        receipt: `ORD-${order._id}`,
+        payment_capture: true,
+      });
+
+      // Save the Razorpay order ID in the database
+      order.razorpayOrderId = razorpayOrder.id;
+      await order.save();
+      return new CustomResponse(200, 'Payment Order Created', {
+        razorpayOrder, // Provide the payment link to the user
+      });
+    } catch (error) {
+      throw new CustomError(500, 'Error creating payment order');
+    }
     // console.log('amount', amount);
-    const order = await this.orderModel.findById(orderId);
-    if (!order) throw new CustomError(404, 'Order not found');
-
-    // Create Razorpay payment order
-    const razorpayOrder = await this.razorpayInstance.orders.create({
-      amount: amount * 100,
-      currency: 'INR',
-      receipt: `ORD-${order._id}`,
-      payment_capture: true,
-    });
-
-    // Save the Razorpay order ID in the database
-    order.razorpayOrderId = razorpayOrder.id;
-    await order.save();
-    return new CustomResponse(200, 'Payment Order Created', {
-      razorpayOrder, // Provide the payment link to the user
-    });
   }
 
   async verifyPayment(body: any) {
