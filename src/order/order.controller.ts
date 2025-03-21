@@ -41,15 +41,12 @@ export class OrderController {
     return this.orderService.refundPayment(orderId);
   }
 
-  @Put('paymentStatus/:id')
+  @Put('paytmentStatus/:id')
   async checkPaymentStatus(
-    @Param('id') razorpayPaymentId: string,
-    @Body() body: { paymentStatus: string }, // ✅ Correct Body Structure
+    @Param('id') id: string,
+    @Body() paymentStatus: string,
   ) {
-    return this.orderService.getPaymentStatus(
-      razorpayPaymentId,
-      body.paymentStatus,
-    );
+    return this.orderService.getPaymentStatus(id, paymentStatus);
   }
 
   @Put('orderStatus/:id')

@@ -157,7 +157,7 @@ export class OrderService {
         razorpayOrder,
       });
     } catch (error) {
-      throw new CustomError(500, 'Error creating payment order');
+      throwException;
     }
   }
 
