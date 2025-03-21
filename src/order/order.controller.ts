@@ -41,7 +41,7 @@ export class OrderController {
     return this.orderService.refundPayment(orderId);
   }
 
-  @Put('paytmentStatus/:id')
+  @Put('paymentStatus/:id')
   async checkPaymentStatus(
     @Param('id') id: string,
     @Body() paymentStatus: string,
