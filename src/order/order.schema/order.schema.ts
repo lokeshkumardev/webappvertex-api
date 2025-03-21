@@ -7,13 +7,13 @@ export const OrderSchema = new Schema(
     riderId: { type: Types.ObjectId, ref: 'Rider', default: null },
     serviceType: { type: String, enum: ['food', 'laundry'], required: true },
 
-    totalAmount: { type: Number, required: true },
-    finalAmount: { type: Number, required: true }, // Final amount after discount and offers
-    totalQuantity: { type: Number, default: 1 },
+    totalAmount: { type: String, required: true },
+    finalAmount: { type: String, required: true }, // Final amount after discount and offers
+    totalQuantity: { type: String, default: '1' },
     address: { type: String, required: true },
 
-    specialOffer: { type: Number, default: 0 }, // Percentage
-    discount: { type: Number, default: 0 }, // Percentage
+    specialOffer: { type: String, default: 0 }, // Percentage
+    discount: { type: String, default: 0 }, // Percentage
     subCategoryId: {
       type: Schema.Types.ObjectId,
       ref: 'Subcategory',
