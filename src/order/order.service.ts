@@ -179,7 +179,7 @@ export class OrderService {
 
     const {
       id: paymentId,
-      razorpayOrderId,
+      order_id: razorpayOrderId,
       signature,
     } = payload.payment.entity;
 
@@ -223,7 +223,7 @@ export class OrderService {
       return new CustomResponse(200, 'Payment verified successfully', order);
     } catch (error) {
       // Catch any errors and return a clear response
-      console.error('Error verifying payment:', error);
+      // console.error('Error verifying payment:', error);
       return new CustomResponse(
         error.statusCode || 500,
         error.message || 'An error occurred while verifying payment',
