@@ -60,7 +60,7 @@ export class AuthService {
   }
 
   // Verify OTP
-  async verifyOTP(createUserDto, fcmToken: string): Promise<any> {
+  async verifyOTP(createUserDto): Promise<any> {
     try {
       const userPhone = createUserDto.userPhone;
 
@@ -72,7 +72,6 @@ export class AuthService {
         createUserDto.otp === user.otp &&
         new Date() < user.otpExpiration
       ) {
-        await this.userModel.updateOne({ userPhone }, { fcmToken });
         return new CustomResponse(HttpStatus.OK, MESSAGE.OTP.VERIFY, user);
       } else if (createUserDto.userType === 'rider') {
         const user = await this.riderModel.findOne({ userPhone });
@@ -86,7 +85,7 @@ export class AuthService {
   }
 
   // Resend OTP
-  async resendOtp(createUserDto): Promise<any> {
+  async resendOtp(createUserDto: any): Promise<any> {
     try {
       const otp = this.generateOTP();
       const userPhone = createUserDto.userPhone;

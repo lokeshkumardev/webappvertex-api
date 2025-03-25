@@ -142,7 +142,7 @@ export class OrderService {
       if (!order) throw new CustomError(404, 'Order not found');
 
       const razorpayOrder = await this.razorpayInstance.orders.create({
-        amount: amount,
+        amount: amount * 100,
         currency: 'INR',
         receipt: `ORD-${order._id}`,
         payment_capture: true,
@@ -302,6 +302,7 @@ export class OrderService {
 
     return new CustomResponse(200, 'Order History Fetch SuccessFully ', orders);
   }
+
   async getPaymentStatus(id: string, paymentStatus: any) {
     try {
       const order = await this.orderModel.findById(id);
