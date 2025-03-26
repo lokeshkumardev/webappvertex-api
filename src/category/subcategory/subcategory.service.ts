@@ -312,7 +312,8 @@ export class SubcategoryService {
           if (
             key === 'is_published' ||
             key === 'categoryId' ||
-            key === 'name'
+            key === 'name' ||
+            key === 'categoryType'
           ) {
             query[key] = value;
           }
