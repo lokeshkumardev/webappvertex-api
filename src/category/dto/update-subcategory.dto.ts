@@ -1,5 +1,11 @@
+import { Type } from 'class-transformer';
 import { IsString, IsOptional, IsMongoId, IsNotEmpty } from 'class-validator';
 
+class LaundryItemDTO {
+  itemName: string;
+  count: number;
+  price: number;
+}
 export class UpdateSubcategoryDto {
   @IsString()
   @IsOptional()
@@ -33,13 +39,10 @@ export class UpdateSubcategoryDto {
   @IsString()
   metaTitle: string;
 
-  @IsOptional()
   // @IsString()
-  laundryItems?: {
-    itemName: string;
-    count: string;
-    price: string;
-  }[];
+  @IsOptional()
+  @Type(() => LaundryItemDTO) // 👈 Ensure proper transformation
+  laundryItems?: LaundryItemDTO[];
 
   @IsOptional()
   @IsString()
