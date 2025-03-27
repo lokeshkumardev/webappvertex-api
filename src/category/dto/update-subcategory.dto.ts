@@ -1,10 +1,19 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsMongoId, IsNotEmpty } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsMongoId,
+  IsNotEmpty,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
 
 class LaundryItemDTO {
   itemName: string;
   count: number;
   price: number;
+  web_image: string;
+  app_image: string;
 }
 export class UpdateSubcategoryDto {
   @IsString()
@@ -40,9 +49,10 @@ export class UpdateSubcategoryDto {
   metaTitle: string;
 
   // @IsString()
-  @IsOptional()
-  @Type(() => LaundryItemDTO) // 👈 Ensure proper transformation
-  laundryItems?: LaundryItemDTO[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => LaundryItemDTO)
+  laundryItems: LaundryItemDTO[];
 
   @IsOptional()
   @IsString()

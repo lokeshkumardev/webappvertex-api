@@ -45,7 +45,7 @@ export class SubcategoryController {
   @UseInterceptors(AnyFilesInterceptor())
   async updateSubcategory(
     @Param('id') id: string,
-    @Body() updateSubcategoryDto: UpdateSubcategoryDTO,
+    @Body() updateSubcategoryDto: CreateSubcategoryDTO,
     @UploadedFiles()
     files: {
       app_image?: Express.Multer.File[];
