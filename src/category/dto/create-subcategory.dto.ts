@@ -6,6 +6,8 @@ class LaundryItemDTO {
   itemName: string;
   count: number;
   price: number;
+  web_image: string;
+  app_image: string;
 }
 export class CreateSubcategoryDTO {
   name: string;

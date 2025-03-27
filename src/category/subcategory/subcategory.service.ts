@@ -143,17 +143,67 @@ export class SubcategoryService {
   // Update Subcategory
   async updateSubcategory(
     id: string,
-    updateSubcategoryDto: UpdateSubcategoryDTO,
+    updateSubcategoryDto: CreateSubcategoryDTO,
     files: any,
   ) {
     try {
-      if (!id || !updateSubcategoryDto || !files) {
-        throw new NotFoundException(400, 'Missing required fields or files');
+      if (!id || !updateSubcategoryDto) {
+        throw new NotFoundException(400, 'Missing required fields');
       }
+
+      // ✅ Pehle se existing subcategory fetch karo
+      const existingSubcategory = await this.subcategoryModel.findById(id);
+      if (!existingSubcategory) {
+        throw new NotFoundException('SubCategory not found');
+      }
+
+      // ✅ Agar laundryItems string mein aaye toh parse karlo
+      if (updateSubcategoryDto.laundryItems) {
+        try {
+          if (typeof updateSubcategoryDto.laundryItems === 'string') {
+            updateSubcategoryDto.laundryItems = JSON.parse(
+              updateSubcategoryDto.laundryItems,
+            );
+          }
+          if (!Array.isArray(updateSubcategoryDto.laundryItems)) {
+            throw new CustomError(
+              501,
+              'Invalid laundryItems format, must be an array',
+            );
+          }
+        } catch (error) {
+          throw new CustomError(501, 'Invalid JSON format for laundryItems');
+        }
+      }
+
+      // ✅ Pehle se stored laundryItems ko include karo
+      const laundryItems =
+        updateSubcategoryDto.laundryItems ||
+        existingSubcategory.laundryItems ||
+        [];
+
+      // ✅ Total price calculate karo (existing + updated)
+      let totalPrice = 0;
+      laundryItems.forEach((item) => {
+        const itemCount = Number(item.count);
+        const itemPrice = Number(item.price);
+        if (isNaN(itemCount) || isNaN(itemPrice)) {
+          throw new CustomError(
+            501,
+            'Invalid count or price value in laundryItems',
+          );
+        }
+        totalPrice += itemCount * itemPrice;
+      });
+
+      updateSubcategoryDto.price = totalPrice; // ✅ Final price set kar diya
+
+      // ✅ Handle file uploads
       if (files && files.length > 0) {
         const webImageFile = files.find(
           (file) => file.fieldname === 'web_image',
         );
+
         if (webImageFile) {
           const webImage = fileUpload(
             'subcategory/webImage',
@@ -174,7 +224,6 @@ export class SubcategoryService {
             'subcategory/appImage',
             appImageFile || null,
           );
-
           updateSubcategoryDto['app_image'] = appImage
             ? [
                 `${process.env.SERVER_BASE_URL}uploads/subcategory/appImage/${appImage}`,
@@ -182,23 +231,21 @@ export class SubcategoryService {
             : [];
         }
       }
-      const category = await this.categoryModel.findById(
-        updateSubcategoryDto.categoryId,
-      );
-      if (!category) {
-        throw new NotFoundException('Category not found');
-      }
+
+      // ✅ Update subcategory in DB
       const subcategory = await this.subcategoryModel.findByIdAndUpdate(
         id,
         updateSubcategoryDto,
         { new: true },
       );
+
       if (!subcategory) {
-        throw new NotFoundException('SubCategory  not found');
+        throw new NotFoundException('SubCategory not found');
       }
+
       return new CustomResponse(
         HttpStatus.OK,
-        'CreateSubcategory Update Successfully',
+        'SubCategory updated successfully',
         subcategory,
       );
     } catch (error) {
